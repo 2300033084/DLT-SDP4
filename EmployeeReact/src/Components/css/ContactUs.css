@@ -1,0 +1,55 @@
+.main-contactus{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 55px;
+}
+.contactus-form{
+    padding: 40px;
+}
+.contactus-form h4{
+    font-size: 30px;
+        font-family: Lexend, sans-serif;
+        margin-bottom: 30px;
+        font-weight: 700;
+        margin-top: 0px;
+        line-height: 36px;
+        
+}
+.contactus-form p{
+    color: rgb(122, 122, 122);
+    margin-bottom: 15px;
+    line-height: 28.8px;
+    margin-top: 0px;
+    box-sizing: border-box;
+}
+.contactus-info{
+    height: 540px;
+    
+}
+.contact-numbers h4{
+    font-size: 16px;
+    color: rgb(122, 122, 122);
+    
+    position: relative;
+    margin-bottom: 30px;
+    box-sizing: border-box;
+    
+}
+.contact-numbers .bi{
+    position: relative;
+    margin-right: 10px;
+    left: 0;
+    color: blue;
+}
+.map{
+    margin-bottom: 30px;
+}
+.contactus-form label{
+    color: rgb(122, 122, 122);
+margin-bottom: 30px;
+}
+.contactus-form input{
+    color: rgb(122, 122, 122);
+    height: 50px;
+}

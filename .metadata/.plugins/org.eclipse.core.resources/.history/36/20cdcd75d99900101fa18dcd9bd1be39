@@ -1,0 +1,52 @@
+package com.klef.sdp.service;
+
+import java.io.ObjectInputFilter.Status;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.klef.sdp.model.Employee;
+import com.klef.sdp.model.Manager;
+import com.klef.sdp.repository.EmployeeRepo;
+import com.klef.sdp.repository.ManagerRepo;
+
+
+@Service
+public class EmployeeService {
+	@Autowired
+    private EmployeeRepo repo;
+	@Autowired
+	private ManagerRepo mrepo;
+	@Autowired
+    private EmailService emailService;
+    public void addEmployee(Employee employee) {
+        repo.save(employee);
+    }
+
+    public List<Employee> getEmployees() {
+        return repo.findAll();
+    }
+    public List<Employee> getEmployeesByManager(Long managerId) {
+        return repo.findByManagerId(managerId);
+    }
+    public Employee updateEmployeeStatus(Long id, Status status) {  // Change String to Status
+        Employee employee = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+        employee.setStatus(status);  // Directly setting Status enum
+        return repo.save(employee);
+    }
+
+	public Manager findManagerById(Long managerId) {
+			// TODO Auto-generated method stub
+			return mrepo.findById(managerId).orElse(null);
+			
+		}
+	public Employee findByEmail(String email) {
+	    return repo.findByEmail(email);
+	}
+
+
+	
+}

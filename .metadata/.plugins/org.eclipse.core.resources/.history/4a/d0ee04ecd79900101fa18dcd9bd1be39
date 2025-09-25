@@ -1,0 +1,11 @@
+package com.klef.sdp.model;
+import org.springframework.stereotype.Repository;
+
+import com.klef.sdp.model.Manager;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+@Repository
+public interface ManagerRepo extends JpaRepository<Manager,Long>{
+
+	Manager findByEmail(String email);
+}

@@ -1,0 +1,124 @@
+body{
+  font-family: Lexend;
+}
+.navbar {
+  background: transparent;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  transition: background 0.3s ease-in-out, padding 0.3s ease-in-out;
+  top: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+/* Sticky behavior for home page */
+.navbar.sticky {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(255, 255, 255);
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  transition: background 0.3s ease-in-out, padding 0.3s ease-in-out;
+  
+  
+}
+
+/* Ensure navbar is always in place on non-home pages */
+.navbar.non-home {
+  position: sticky; /* Pushes content down */
+  background: rgba(255, 255, 255);
+ 
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  box-shadow: 0 10px 8px rgba(150, 150, 150, 0.1);
+  
+}
+
+/* Adjust text color on sticky navbar */
+.navbar.sticky .nav-links,
+.navbar.sticky .navbar-logo {
+  color: black;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  
+  padding: 0 20px;
+}
+
+.navbar-logo {
+  position: relative;
+  right: -30px;
+  color: white;
+  font-size: 1.5rem;
+  text-decoration: none;
+  padding-bottom: 20px;
+}
+
+.nav-menu {
+  display: flex;
+  list-style: none;
+  text-align: center;
+}
+
+.nav-item {
+  height: 80px;
+}
+
+.nav-links {
+  color: white;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  padding: 0 1rem;
+  height: 70px;
+  margin-right: 15px;
+
+}
+
+.nav-links:hover {
+  
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.navbar.sticky .nav-links {
+  color: black;
+}
+
+.navbar.sticky .navbar-logo {
+  color: black;
+}
+
+.login-button {
+  position: relative;
+  left: 55px;
+  background-color: #3390ec;
+  margin-right: 0;
+  width: 100px;
+  height: 50px;
+}
+
+.signup-button {
+  position: relative;
+  right:33px;
+  background-color: #3390ec;
+  margin-left: 0;
+  width: 100px;
+  height: 50px;
+}
+.navbar.sticky .signup-button {
+  bottom: 9px;
+  border-color: #000; /* Change border color */
+  color: #000; /* Change text color */
+}
+.navbar.sticky .login-button{
+  bottom: 9px;
+}

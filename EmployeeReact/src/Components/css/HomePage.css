@@ -1,0 +1,282 @@
+*{
+  font-family: Lexend, sans-serif;
+}
+
+.hero-section {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.background-image {
+  width: 100%;
+  background-attachment: fixed;
+  object-fit: cover;
+
+  z-index: -1;
+  filter: brightness(0.6);
+ 
+}
+
+.hero-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+.hero-text h1 {
+  font-weight: 600;
+  font-family: Lexend, sans-serif;
+  font-size: 3em;
+  margin-top: 8px;
+  line-height: 75px;
+}
+
+.hero-text h3 {
+  font-family: Lexend, sans-serif;
+  font-size: 22px;
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+
+.hero-text p {
+  font-size: 1em;
+  margin-top: 10px;
+  font-size: 20px;
+
+  margin: auto auto 30px;
+  margin-bottom: 30px;
+  line-height: 36px;
+  margin-top: 0px;
+}
+
+.btn-primary {
+  background-color: #3390ec;
+  margin-right: 40px;
+}
+
+.navbar-overlay {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 5; /* Above the image */
+}
+.about-section {
+  background-color: #bde4ff;
+  padding: 50px;
+  display: flex;
+  justify-self: around;
+  
+
+  margin: 50px 30px;
+
+  border-radius: 15px;
+}
+.container-about {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: auto;
+  padding: 50px 20px;
+  gap: 30px; /* Space between sections */
+}
+.row-1,
+.row-2 {
+  flex: 1; /* Both take equal space */
+}
+.row-1 {
+  display: flex;
+
+  flex-direction: column;
+  align-items: start;
+}
+
+.row-1 .heading-1 {
+  display: flex;
+  align-items: center;
+  color: #434343;
+  margin-bottom: 10px;
+}
+
+.row-1 .heading-1 i {
+  margin-right: 10px;
+}
+
+.row-1 .heading-1 h4 {
+  margin: 0;
+}
+.row-1 .heading-2 h2 {
+  font-family: Lexend, sans-serif;
+  font-weight: 700;
+  margin-top: 0px;
+  line-height: 57.6px;
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+.row-2 {
+  display: flex;
+  justify-content: center;
+  z-index: 1; /* Centers the card inside */
+}
+.quote-card {
+  position: relative;
+  width: 280px;
+  font-family: Lexend, sans-serif;
+  height: 450px;
+  background-color: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  padding: 12px;
+  gap: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.quote-card .quote-icon {
+  color: #ffffff;
+}
+.quote-card h3 {
+  color: #ffffff;
+}
+.quote-card p {
+  color: #ffffff;
+}
+.quote-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  left: -5px;
+  margin: auto;
+  width: 290px;
+  height: 460px;
+  border-radius: 10px;
+  background: linear-gradient(-45deg, #e81cff 0%, #40c9ff 100%);
+  z-index: -10;
+  pointer-events: none;
+  transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.quote-card::after {
+  content: "";
+  z-index: -1;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(-45deg, #fc00ff 0%, #00dbde 100%);
+  transform: translate3d(0, 0, 0) scale(0.95);
+  filter: blur(20px);
+}
+
+.heading {
+  font-size: 20px;
+  text-transform: capitalize;
+  font-weight: 700;
+}
+
+.quote-card p:not(.heading) {
+  font-size: 14px;
+}
+
+.quote-card p:last-child {
+  color: #e81cff;
+  font-weight: 600;
+}
+
+.quote-card:hover::after {
+  filter: blur(30px);
+}
+
+.quote-card:hover::before {
+  transform: rotate(-90deg) scaleX(1.34) scaleY(0.77);
+}
+
+.wrapper {
+  width: 100%;
+  height: 450px;
+  position: relative;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.inner {
+  --w: 180px;
+  --h: 120px;
+  --translateZ: calc(var(--w) + var(--h) + 0px);
+  --rotateX: -10deg;
+  --perspective: 700px;
+  --quantity: 10; /* Set quantity variable */
+
+  position: absolute;
+  width: var(--w);
+  height: var(--h);
+  top: 20%;
+  left: calc(50% - (var(--w) / 2) - 2.5px);
+  z-index: 0;
+  transform-style: preserve-3d;
+  transform: perspective(var(--perspective));
+  animation: rotating 20s linear infinite;
+}
+
+@keyframes rotating {
+  from {
+    transform: perspective(var(--perspective)) rotateX(var(--rotateX))
+      rotateY(0);
+  }
+  to {
+    transform: perspective(var(--perspective)) rotateX(var(--rotateX))
+      rotateY(1turn);
+  }
+}
+
+.company-card {
+  position: absolute;
+  z-index: 0;
+  
+  border-radius: 12px;
+  overflow: hidden;
+  inset: 0;
+  transform: rotateY(calc((360deg / var(--quantity)) * var(--index)))
+    translateZ(var(--translateZ));
+}
+
+.img {
+  padding: 10px 1px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.company-card .img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Ensures logos fit within the box */
+  border-radius: 10px;
+}
+.companies-section {
+  background-color: #000000;
+  text-align: center;
+  padding: 30px 0;
+  margin: 0px 30px;
+  border-radius: 15px;
+}
+
+.section-heading {
+  color: #ffffff;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.section-description {
+  font-size: 1.2rem;
+  color: #ececec;
+  margin-bottom: 10px;
+}

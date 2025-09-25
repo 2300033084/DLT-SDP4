@@ -1,0 +1,86 @@
+.container-aboutus {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: auto;
+  position: relative; /* Ensures .container-card is positioned relative to .container */
+}
+
+.container-image {
+  /* Add any additional styles if needed */
+}
+
+.container-image img {
+  height: 450px;
+  width: 1450px;
+  object-fit: cover;
+}
+
+.container-aboutus .container-card {
+  background: transparent url("/images/White-Wave-PNG-Image.png");
+  width: 560px;
+  height: 220px;
+
+  font-family: Lexend;
+  position: absolute;
+  top: 74%; /* Center the card vertically */
+  left: 11%; /* Center the card horizontally */
+  /* Adjust the position to be centered */
+  color: white;
+  background-color: #3390ec; /* Add a background color for visibility */
+  padding: 40px; /* Add padding for content inside the card */
+  /* Add border radius for rounded corners */
+  /* Add a shadow for better visibility */
+  z-index: 1; /* Ensure the card is above the image */
+}
+.container-image h2 {
+  font-size: 48px;
+  color: rgb(255, 255, 255);
+  font-family: Lexend, sans-serif;
+  font-weight: 700;
+}
+
+.about-us {
+  margin-top: 180px;
+}
+.about-us-card {
+  display: flex;
+  flex-direction: row;
+  height: 450px;
+}
+.about-us-card-image {
+  width: 50%;
+}
+.about-us-card .image {
+  width: 758px;
+  height: 450px;
+  background-position: 50% 50%;
+}
+.about-us-card-text {
+  width: 50%;
+  padding: 25px; /* Add padding for text content */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center the text vertically */
+  font-family: Lexend, sans-serif;
+}
+
+.about-us-card-text h2 {
+  font-weight: 700;
+  font-size: 40px;
+  margin-bottom: 10px;
+  margin-bottom: 15px;
+  color: #333;
+}
+.about-us-card-text h4 {
+  margin-bottom: 20px;
+
+  color: #575757;
+}
+.about-us-card-text p {
+  line-height: 40px;
+  margin-bottom: 14px;
+  font-size: 17px;
+  color: #797979;
+  
+}

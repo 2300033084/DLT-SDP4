@@ -1,0 +1,5 @@
+package com.klef.sdp.model;
+
+public class Attendance {
+
+}

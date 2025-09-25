@@ -1,0 +1,172 @@
+.container-signup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+.signup {
+    margin-top: 15px;
+  color: #4e4e4e;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: block;
+  font-weight: bold;
+  font-size: x-large;
+  text-decoration: none;
+}
+.card-signup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 350px;
+  width: 400px;
+  flex-direction: column;
+  gap: 35px;
+  background: #ffffff;
+  box-shadow: 16px 16px 32px #eeeeee, -16px -16px 32px #fefefe;
+  border-radius: 8px;
+}
+
+.inputBox-signup {
+  position: relative;
+  width: 320px;
+}
+
+ .inputBox-signup input {
+  width: 100%;
+  padding: 10px;
+  outline: none;
+  border: none;
+  color: #000;
+  font-size: 1em;
+  background: transparent;
+  border:2px solid #818181 ;
+ 
+  transition: 0.1s;
+  border-radius: 8px;
+}
+
+ .inputBox-signup span {
+  margin-top: 5px;
+  position: absolute;
+  left: 0;
+  transform: translateY(-4px);
+  margin-left: 10px;
+  padding: 12px;
+  pointer-events: none;
+  font-size: 12px;
+  color: #898989;
+  text-transform: uppercase;
+  transition: 0.5s;
+  letter-spacing: 3px;
+  border-radius: 8px;
+}
+
+ .inputBox-signup input:valid ~ span,
+ .inputBox-signup input:focus ~ span {
+  transform: translateX(170px) translateY(-15px);
+  font-size: 0.8em;
+  padding: 5px 10px;
+  background: #000;
+  letter-spacing: 0.2em;
+  color: #fff;
+  border: 2px;
+}
+
+ .inputBox-signup input:valid,
+ .inputBox-signup input:focus {
+  border: 2px solid #000;
+  border-radius: 8px;
+}
+
+ .enter-signup {
+  height: 45px;
+  width: 100px;
+  border-radius: 5px;
+  border: 2px solid #000;
+  cursor: pointer;
+  background-color: transparent;
+  transition: 0.5s;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 2px;
+  margin-bottom: 1em;
+}
+
+ .enter-.signup:hover {
+  background-color: rgb(0, 0, 0);
+  color: white;
+}
+
+ .wrapper-signup {
+  --font-color-dark: #323232;
+  --font-color-light: #fff;
+  --bg-color: #fff;
+  --main-color: #323232;
+  --secondary-color: #505050;
+  position: relative;
+  width: 260px;
+  height: 36px;
+  background-color: var(--bg-color);
+  border: 2px solid var(--main-color);
+  border-radius: 34px;
+  display: flex;
+  flex-direction: row;
+  box-shadow: 4px 4px var(--main-color);
+}
+
+ .wrapper-signup .option {
+  margin-right: 5px;
+  width: 80.5px;
+  height: 28px;
+  position: relative;
+  top: 2px;
+  left: 2px;
+  border-radius: 34px;
+  transition: 0.25s cubic-bezier(0, 0, 0, 1);
+}
+
+.wrapper-signup .option:last-child {
+  margin-right: 4px;
+}
+
+.wrapper-signup .option:hover {
+  background-color: var(--secondary-color);
+}
+
+.wrapper-signup .option:hover .span {
+  color: var(--font-color-light);
+}
+
+ .wrapper-signup .input {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  appearance: none;
+  cursor: pointer;
+}
+
+ .wrapper-signup .btn {
+  width: 100%;
+  height: 100%;
+  border-radius: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.wrapper-signup .span {
+  color: var(--font-color-dark);
+}
+
+.wrapper-signup .input:checked + .btn {
+  background-color: var(--main-color);
+  transition: 0.2s cubic-bezier(0, 0, 0, 1);
+}
+
+.wrapper-signup .input:checked + .btn .span {
+  color: var(--font-color-light);
+  transition: 0.25s cubic-bezier(0, 0, 0, 1);
+}
