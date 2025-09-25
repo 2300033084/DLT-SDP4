@@ -17,11 +17,12 @@ const ProfilePage = () => {
     const userName = localStorage.getItem('userName') || 'User';
 
     const isEmployee = role === 'EMPLOYEE';
-    const API_BASE_URL = 'http://localhost:8080';
+    //const API_BASE_URL = 'http://localhost:8080';
+    const baseUrl = `${import.meta.env.VITE_API_URL}`;
     // Determine the correct API endpoint based on the user role
     const API_URL = isEmployee 
-        ? `${API_BASE_URL}/api/employees/profile/${id}` 
-        : `${API_BASE_URL}/manager/profile/${id}`;
+        ? `${baseUrl}/api/employees/profile/${id}` 
+        : `${baseUrl}/manager/profile/${id}`;
     
     // Determine the base dashboard link for the sidebar
     const baseRoute = isEmployee ? '/employeedashboard' : '/managerdashboard';

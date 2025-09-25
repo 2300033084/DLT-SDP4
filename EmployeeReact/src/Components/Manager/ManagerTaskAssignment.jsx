@@ -23,7 +23,9 @@ const ManagerTaskAssignment = () => {
   const location = useLocation();
   const managerId = localStorage.getItem("managerId");
   const managerName = localStorage.getItem("userName") || "Manager";
-  const API_BASE_URL = "http://localhost:8080";
+  //const API_BASE_URL = "http://localhost:8080";
+  const baseUrl = `${import.meta.env.VITE_API_URL}`;
+
 
   // Helper function for active link highlighting
   const getLinkClass = (path) =>
@@ -34,7 +36,7 @@ const ManagerTaskAssignment = () => {
   const fetchEmployeesAndTasks = async () => {
     try {
       setLoading(true);
-      const employeesResponse = await axios.get(`${API_BASE_URL}/api/employees/byManager/${managerId}`);
+      const employeesResponse = await axios.get(`${baseUrl}/api/employees/byManager/${managerId}`);
       const employeesData = employeesResponse.data;
       setEmployees(employeesData);
 
@@ -42,7 +44,7 @@ const ManagerTaskAssignment = () => {
       // Fetch tasks for each employee under the manager
       await Promise.all(
         employeesData.map(async (employee) => {
-          const tasksResponse = await axios.get(`${API_BASE_URL}/api/tasks/employee/${employee.id}`);
+          const tasksResponse = await axios.get(`${baseUrl}/api/tasks/employee/${employee.id}`);
           tasksResponse.data.forEach(task => allTasks.push({ ...task, employeeName: employee.name }));
         })
       );
@@ -78,7 +80,7 @@ const ManagerTaskAssignment = () => {
     setError(null);
     try {
       await axios.post(
-        `${API_BASE_URL}/api/tasks/create/${taskData.employeeId}`,
+        `${baseUrl}/api/tasks/create/${taskData.employeeId}`,
         {
           title: taskData.title,
           description: taskData.description,
@@ -105,7 +107,7 @@ const ManagerTaskAssignment = () => {
   const handleTaskDelete = async (taskId) => {
     if (window.confirm("Are you sure you want to delete this task?")) {
       try {
-        await axios.delete(`${API_BASE_URL}/api/tasks/${taskId}`);
+        await axios.delete(`${baseUrl}/api/tasks/${taskId}`);
         fetchEmployeesAndTasks(); // Refresh data
         alert("Task deleted successfully!");
       } catch (err) {

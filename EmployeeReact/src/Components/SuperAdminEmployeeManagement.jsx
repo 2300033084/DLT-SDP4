@@ -11,17 +11,18 @@ const SuperAdminEmployeeManagement = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
-    const API_BASE_URL = 'http://localhost:8080';
+    //const API_BASE_URL = 'http://localhost:8080';
+    const baseUrl = `${import.meta.env.VITE_API_URL}`;
 
     const fetchManagersWithEmployees = async () => {
         try {
             setLoading(true);
-            const managersResponse = await axios.get(`${API_BASE_URL}/manager/allManagers`);
+            const managersResponse = await axios.get(`${baseUrl}/manager/allManagers`);
             const managersData = managersResponse.data;
 
             const managersWithEmployees = await Promise.all(
                 managersData.map(async (manager) => {
-                    const employeesResponse = await axios.get(`${API_BASE_URL}/api/employees/byManager/${manager.id}`);
+                    const employeesResponse = await axios.get(`${baseUrl}/api/employees/byManager/${manager.id}`);
                     return {
                         ...manager,
                         employees: employeesResponse.data || []
@@ -44,7 +45,7 @@ const SuperAdminEmployeeManagement = () => {
     const handleDeactivateEmployee = async (employeeId) => {
         if (window.confirm("Are you sure you want to deactivate this employee? They will no longer be able to log in.")) {
             try {
-                const url = `${API_BASE_URL}/superadmin/updateEmployeeStatus/${employeeId}`;
+                const url = `${baseUrl}/superadmin/updateEmployeeStatus/${employeeId}`;
                 const response = await axios.post(url, null, { params: { status: 'DEACTIVATED' } });
                 
                 fetchManagersWithEmployees();

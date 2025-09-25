@@ -5,6 +5,8 @@ import axios from 'axios';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './EmployeeDashboard.css';
 
+const baseUrl = `${import.meta.env.VITE_API_URL}`;
+
 const EmployeeTaskView = () => {
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -13,12 +15,12 @@ const EmployeeTaskView = () => {
     const location = useLocation();
     const employeeId = localStorage.getItem('employeeId');
     const employeeName = localStorage.getItem('userName') || 'Employee';
-    const API_BASE_URL = 'http://localhost:8080';
+    //const API_BASE_URL = 'http://localhost:8080';
 
     const fetchTasks = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`${API_BASE_URL}/api/tasks/employee/${employeeId}`);
+            const response = await axios.get(`${baseUrl}/api/tasks/employee/${employeeId}`);
             setTasks(response.data);
         } catch (err) {
             setError("Failed to fetch tasks. Please check the API server.");
@@ -38,7 +40,7 @@ const EmployeeTaskView = () => {
 
     const handleUpdateStatus = async (taskId, newStatus) => {
         try {
-            await axios.put(`${API_BASE_URL}/api/tasks/${taskId}/status?status=${newStatus}`);
+            await axios.put(`${baseUrl}/api/tasks/${taskId}/status?status=${newStatus}`);
             fetchTasks(); // Refresh the task list
             alert(`Task status updated to ${newStatus}.`);
         } catch (err) {

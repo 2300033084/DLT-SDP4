@@ -6,6 +6,8 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './EmployeeDashboard.css'; // Import the new CSS file
 
+const baseUrl = `${import.meta.env.VITE_API_URL}`;
+
 const EmployeePayrollPage = () => {
     const [payrollData, setPayrollData] = useState(null);
     const [selectedMonth, setSelectedMonth] = useState(new Date());
@@ -36,7 +38,7 @@ const EmployeePayrollPage = () => {
                 const year = selectedMonth.getFullYear();
                 const month = selectedMonth.getMonth() + 1;
                 
-                const response = await axios.get(`http://localhost:8080/api/payroll/employee/${employeeId}/month?year=${year}&month=${month}`);
+                const response = await axios.get(`${baseUrl}/api/payroll/employee/${employeeId}/month?year=${year}&month=${month}`);
                 
                 setPayrollData(response.data);
             } catch (err) {

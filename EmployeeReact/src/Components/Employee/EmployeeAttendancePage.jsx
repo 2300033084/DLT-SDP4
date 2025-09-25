@@ -6,6 +6,8 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './EmployeeDashboard.css'; // Import the new CSS file
 
+const baseUrl = `${import.meta.env.VITE_API_URL}`;
+
 const EmployeeAttendancePage = () => {
   const [attendances, setAttendances] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -29,18 +31,18 @@ const EmployeeAttendancePage = () => {
       setError('');
       try {
         let response;
-        const API_BASE_URL = 'http://localhost:8080';
+        //const API_BASE_URL = 'http://localhost:8080';
         if (viewMode === 'daily') {
           const dateStr = selectedDate.toISOString().split('T')[0];
           // Correct API endpoint for fetching a single day's attendance
-          response = await axios.get(`${API_BASE_URL}/api/attendance/employee/${employeeId}/date?date=${dateStr}`);
+          response = await axios.get(`${baseUrl}/api/attendance/employee/${employeeId}/date?date=${dateStr}`);
           // The API returns a single object or null, so we wrap it in an array if it exists.
           setAttendances(response.data ? [response.data] : []);
         } else {
           const startStr = rangeStart.toISOString().split('T')[0];
           const endStr = rangeEnd.toISOString().split('T')[0];
           // Correct API endpoint for fetching a date range
-          response = await axios.get(`${API_BASE_URL}/api/attendance/employee/${employeeId}/range?startDate=${startStr}&endDate=${endStr}`);
+          response = await axios.get(`${baseUrl}/api/attendance/employee/${employeeId}/range?startDate=${startStr}&endDate=${endStr}`);
           setAttendances(response.data);
         }
       } catch (err) {

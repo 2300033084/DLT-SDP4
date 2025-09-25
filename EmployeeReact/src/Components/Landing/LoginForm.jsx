@@ -9,10 +9,11 @@ const LoginForm = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-
+  
+  const baseUrl = `${import.meta.env.VITE_API_URL}`;
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:8080/auth/login", null, {
+      const response = await axios.post(`${baseUrl}/auth/login`, null, {
         params: { email, password },
       });
 

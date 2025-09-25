@@ -27,7 +27,8 @@ const ManagerDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const managerName = localStorage.getItem("userName") || "Manager";
-  const API_BASE_URL = 'http://localhost:8080';
+  //const API_BASE_URL = 'http://localhost:8080';
+  const baseUrl = `${import.meta.env.VITE_API_URL}`;
 
   useEffect(() => {
     const storedManagerId = localStorage.getItem("managerId");
@@ -43,7 +44,7 @@ const ManagerDashboard = () => {
   const fetchEmployees = async (id) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/employees/byManager/${id}`
+        `${baseUrl}/employees/byManager/${id}`
       );
       setEmployees(response.data);
       setLoading(false);
@@ -56,8 +57,8 @@ const ManagerDashboard = () => {
   const fetchDashboardStats = async (id) => {
     try {
       const [employeesRes, leavesRes] = await Promise.all([
-        axios.get(`${API_BASE_URL}/employees/byManager/${id}`), // Correct endpoint
-        axios.get(`${API_BASE_URL}/api/leave-requests/status/PENDING`),
+        axios.get(`${baseUrl}/employees/byManager/${id}`), // Correct endpoint
+        axios.get(`${baseUrl}/api/leave-requests/status/PENDING`),
       ]);
 
       const employeesInTeam = employeesRes.data.filter(emp => emp.manager.id == id);

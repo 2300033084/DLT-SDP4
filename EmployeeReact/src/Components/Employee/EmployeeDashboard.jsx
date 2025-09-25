@@ -19,7 +19,9 @@ const EmployeeDashboard = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const API_BASE_URL = 'http://localhost:8080';
+  //const API_BASE_URL = 'http://localhost:8080';
+  
+  const baseUrl = `${import.meta.env.VITE_API_URL}`;
 
 
   // Fetch all dashboard data
@@ -38,10 +40,10 @@ const EmployeeDashboard = () => {
         
         // Use Promise.all to fetch all data concurrently and more efficiently
         const [leaveResponse, attendanceResponse, employeeProfileResponse, announcementsResponse] = await Promise.all([
-          axios.get(`${API_BASE_URL}/api/leave-requests/employee/${employeeId}`),
-          axios.get(`${API_BASE_URL}/api/attendance/employee/${employeeId}/month?year=${currentYear}&month=${currentMonth}`),
-          axios.get(`${API_BASE_URL}/api/employees/profile/${employeeId}`),
-          axios.get(`${API_BASE_URL}/api/announcements`) // Fetching announcements
+          axios.get(`${baseUrl}/api/leave-requests/employee/${employeeId}`),
+          axios.get(`${baseUrl}/api/attendance/employee/${employeeId}/month?year=${currentYear}&month=${currentMonth}`),
+          axios.get(`${baseUrl}/api/employees/profile/${employeeId}`),
+          axios.get(`${baseUrl}/api/announcements`) // Fetching announcements
         ]);
 
         const allLeaveRequests = leaveResponse.data || [];
@@ -58,7 +60,7 @@ const EmployeeDashboard = () => {
         const employeeProfileData = employeeProfileResponse.data;
         if (employeeProfileData && employeeProfileData.manager && employeeProfileData.manager.id) {
           const managerId = employeeProfileData.manager.id;
-          const teamMembersResponse = await axios.get(`${API_BASE_URL}/api/employees/byManager/${managerId}`);
+          const teamMembersResponse = await axios.get(`${baseUrl}/api/employees/byManager/${managerId}`);
           teamMembersCount = teamMembersResponse.data ? teamMembersResponse.data.length : 0;
         }
 

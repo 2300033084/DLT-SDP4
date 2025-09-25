@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Container, 
   Card, 
@@ -14,10 +14,11 @@ import {
   Badge,
   Spinner
 } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import './ManagerDashboard.css';
 
 const ManagerAttendancePage = () => {
@@ -32,36 +33,79 @@ const ManagerAttendancePage = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  
   const navigate = useNavigate();
-  const managerName = localStorage.getItem("managerName") || "Manager";
+  const location = useLocation();
+  const managerId = localStorage.getItem("managerId");
+  const managerName = localStorage.getItem("userName") || "Manager";
+  
+  // Use environment variable for the base API URL
+  const baseUrl = import.meta.env.VITE_API_URL;
 
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login");
   };
 
-  // Fetch employees and attendance records
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        // Fetch employees
-        const empResponse = await axios.get('/employees/allEmployees');
-        setEmployees(empResponse.data);
+  const getLinkClass = (path) =>
+    `text-white hover-bg-primary-dark rounded ${
+      location.pathname === path ? "active bg-primary-dark" : ""
+    }`;
 
-        // Fetch attendance for selected date
+  // Fetch employees under the current manager
+  const fetchEmployees = async () => {
+    try {
+      const empResponse = await axios.get(`${baseUrl}/api/employees/byManager/${managerId}`);
+      setEmployees(empResponse.data);
+      return empResponse.data;
+    } catch (error) {
+      console.error('Error fetching employees:', error);
+      setError('Failed to fetch employee list.');
+      return [];
+    }
+  };
+
+  // Fetch attendance records for the selected date for the manager's team
+  const fetchAttendance = async () => {
+    setLoading(true);
+    setError('');
+    setSuccess('');
+    try {
         const dateStr = selectedDate.toISOString().split('T')[0];
-        const attResponse = await axios.get(`/api/attendance/date/${dateStr}`);
-        setAttendances(attResponse.data);
-      } catch (error) {
-        console.error('Error fetching employees or attendance:', error);
-        setError('Failed to fetch data');
-      } finally {
+        const allEmployees = await fetchEmployees();
+        
+        const attResponse = await axios.get(`${baseUrl}/api/attendance/date/${dateStr}`);
+        const allAttendanceForDate = attResponse.data;
+        
+        const filteredAttendance = allAttendanceForDate.filter(record => 
+            allEmployees.some(employee => employee.id === record.employeeId)
+        );
+
+        const attendanceWithNames = filteredAttendance.map(record => {
+            const employee = allEmployees.find(emp => emp.id === record.employeeId);
+            return {
+                ...record,
+                employeeName: employee ? employee.name : `Employee #${record.employeeId}`
+            };
+        });
+
+        setAttendances(attendanceWithNames);
+
+    } catch (error) {
+        console.error('Error fetching attendance:', error);
+        setError('Failed to fetch attendance records.');
+    } finally {
         setLoading(false);
-      }
-    };
-    fetchData();
-  }, [selectedDate]);
+    }
+  };
+
+  useEffect(() => {
+    if (managerId) {
+        fetchAttendance();
+    } else {
+        navigate("/login");
+    }
+  }, [selectedDate, managerId, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -75,64 +119,51 @@ const ManagerAttendancePage = () => {
 
     try {
       const dateStr = selectedDate.toISOString().split('T')[0];
-      await axios.post(`/api/attendance?employeeId=${formData.employeeId}&date=${dateStr}&status=${formData.status}`);
-
-      // Refresh attendance data
-      const response = await axios.get(`/api/attendance/date/${dateStr}`);
-      setAttendances(response.data);
-      
+      await axios.post(
+        `${baseUrl}/api/attendance?employeeId=${formData.employeeId}&date=${dateStr}&status=${formData.status}`
+      );
       setSuccess('Attendance marked successfully!');
       setShowModal(false);
       setFormData({ employeeId: '', status: 'PRESENT' });
+      fetchAttendance(); // Refresh table
     } catch (err) {
+      console.error("Failed to mark attendance:", err);
       setError(err.response?.data?.message || 'Failed to mark attendance');
     }
   };
 
-  const handleBulkStatusChange = async (status) => {
-    if (!window.confirm(`Mark all employees as ${status} for ${selectedDate.toISOString().split('T')[0]}?`)) {
-      return;
-    }
-
+  const updateAttendanceStatus = async (employeeId, status) => {
+    setError('');
+    setSuccess('');
     try {
       const dateStr = selectedDate.toISOString().split('T')[0];
-      await axios.post('/api/attendance/bulk', {
-        date: dateStr,
-        status: status
-      });
-
-      // Refresh attendance data
-      const response = await axios.get(`/api/attendance/date/${dateStr}`);
-      setAttendances(response.data);
-      
-      setSuccess(`All employees marked as ${status} successfully!`);
+      await axios.post(
+        `${baseUrl}/api/attendance?employeeId=${employeeId}&date=${dateStr}&status=${status}`
+      );
+      setSuccess(`Attendance status updated to ${status}`);
+      fetchAttendance(); // Refresh table
     } catch (err) {
+      console.error("Failed to update attendance status:", err);
       setError(err.response?.data?.message || 'Failed to update attendance');
     }
   };
 
-  async function updateAttendanceStatus(id, status) {
-    try {
-      await axios.put(`/api/attendance/${id}/status?status=${status}`);
-      
-      // Refresh attendance data
-      const dateStr = selectedDate.toISOString().split('T')[0];
-      const response = await axios.get(`/api/attendance/date/${dateStr}`);
-      setAttendances(response.data);
-      
-      setSuccess(`Attendance status updated to ${status}`);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update attendance');
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'PRESENT': return 'success';
+      case 'ABSENT': return 'danger';
+      case 'LEAVE': return 'info';
+      default: return 'secondary';
     }
-  }
+  };
 
   return (
     <Container fluid className="dashboard-container">
       <Row className="g-0">
-        {/* Sidebar - Consistent with ManagerLeavePage */}
+        {/* Sidebar */}
         <Col md={2} className="sidebar bg-primary text-white vh-100 sticky-top">
           <div className="sidebar-header p-4 text-center">
-            <h4 className="text-white">HR Portal</h4>
+            <h4 className="text-white">Manager Portal</h4>
             <div className="employee-info mt-4">
               <div 
                 className="avatar bg-white text-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
@@ -147,28 +178,28 @@ const ManagerAttendancePage = () => {
 
           <Nav className="flex-column p-3">
             <Nav.Item className="mb-2">
-              <Nav.Link as={Link} to="/managerdashboard" className="text-white hover-bg-primary-dark rounded">
+              <Nav.Link as={Link} to="/managerdashboard" className={getLinkClass("/managerdashboard")}>
                 <i className="bi bi-speedometer2 me-2"></i>Dashboard
               </Nav.Link>
             </Nav.Item>
             <Nav.Item className="mb-2">
-              <Nav.Link as={Link} to="/leave/approvals" className="text-white hover-bg-primary-dark rounded">
+              <Nav.Link as={Link} to="/leave/approvals" className={getLinkClass("/leave/approvals")}>
                 <i className="bi bi-calendar-event me-2"></i>Leave Approvals
               </Nav.Link>
             </Nav.Item>
             <Nav.Item className="mb-2">
-              <Nav.Link as={Link} to="/attendance/manage" className="text-white active bg-primary-dark rounded">
+              <Nav.Link as={Link} to="/attendance/manage" className={getLinkClass("/attendance/manage")}>
                 <i className="bi bi-clock-history me-2"></i>Attendance
               </Nav.Link>
             </Nav.Item>
             <Nav.Item className="mb-2">
-              <Nav.Link href="#" className="text-white hover-bg-primary-dark rounded">
-                <i className="bi bi-people-fill me-2"></i>Team Management
+              <Nav.Link as={Link} to="/manager/tasks" className={getLinkClass("/manager/tasks")}>
+                <i className="bi bi-list-task me-2"></i>Task Management
               </Nav.Link>
             </Nav.Item>
             <Nav.Item className="mb-2">
-              <Nav.Link href="#" className="text-white hover-bg-primary-dark rounded">
-                <i className="bi bi-graph-up me-2"></i>Reports
+              <Nav.Link as={Link} to="#" className={getLinkClass("#")}>
+                <i className="bi bi-people-fill me-2"></i>Team Management
               </Nav.Link>
             </Nav.Item>
             <Nav.Item className="mt-4">
@@ -186,25 +217,8 @@ const ManagerAttendancePage = () => {
 
         {/* Main Content Area */}
         <Col md={10} className="main-content p-4 bg-light">
-          {/* Top Navigation */}
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h2 className="text-primary">Attendance Management</h2>
-            <div className="d-flex align-items-center">
-              <Button variant="outline-primary" size="sm" className="me-2">
-                <i className="bi bi-bell-fill"></i>
-              </Button>
-              <Button variant="outline-primary" size="sm" className="me-3">
-                <i className="bi bi-envelope-fill"></i>
-              </Button>
-              <span className="text-muted">
-                {new Date().toLocaleDateString("en-US", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </span>
-            </div>
           </div>
 
           {error && <Alert variant="danger" onClose={() => setError('')} dismissible>{error}</Alert>}
@@ -222,23 +236,15 @@ const ManagerAttendancePage = () => {
                 />
               </Form.Group>
             </Col>
-            <Col md={6} className="d-flex align-items-end">
-              <ButtonGroup>
-                <Button variant="success" onClick={() => handleBulkStatusChange('PRESENT')}>
-                  Mark All Present
-                </Button>
-                <Button variant="danger" onClick={() => handleBulkStatusChange('ABSENT')}>
-                  Mark All Absent
-                </Button>
-                <Button variant="primary" onClick={() => setShowModal(true)}>
-                  Add Individual
-                </Button>
-              </ButtonGroup>
+            <Col md={6} className="d-flex align-items-end justify-content-end">
+              <Button variant="primary" onClick={() => setShowModal(true)}>
+                Mark Attendance for an Employee
+              </Button>
             </Col>
           </Row>
-
-          <Card className="shadow-sm border-0" style={{ width: '500px' }}>
-            <Card.Body className="p-3" style={{ marginLeft: '0px' }}>
+          
+          <Card className="shadow-sm border-0">
+            <Card.Body className="p-3">
               {loading ? (
                 <div className="text-center py-5">
                   <Spinner animation="border" variant="primary" />
@@ -258,14 +264,11 @@ const ManagerAttendancePage = () => {
                     <tbody>
                       {attendances.map(attendance => (
                         <tr key={attendance.id}>
-                          <td>{attendance.employee?.name || `Employee ${attendance.employeeId}`}</td>
+                          <td>{attendance.employeeName || `Employee ${attendance.employeeId}`}</td>
                           <td>{attendance.date}</td>
                           <td>
                             <Badge 
-                              bg={
-                                attendance.status === 'PRESENT' ? 'success' : 
-                                attendance.status === 'LEAVE' ? 'info' : 'danger'
-                              }
+                              bg={getStatusBadge(attendance.status)}
                               className="rounded-pill"
                             >
                               {attendance.status}
@@ -275,21 +278,21 @@ const ManagerAttendancePage = () => {
                             <ButtonGroup size="sm">
                               <Button 
                                 variant="outline-success" 
-                                onClick={() => updateAttendanceStatus(attendance.id, 'PRESENT')}
+                                onClick={() => updateAttendanceStatus(attendance.employeeId, 'PRESENT')}
                                 disabled={attendance.status === 'PRESENT'}
                               >
                                 Present
                               </Button>
                               <Button 
                                 variant="outline-danger" 
-                                onClick={() => updateAttendanceStatus(attendance.id, 'ABSENT')}
+                                onClick={() => updateAttendanceStatus(attendance.employeeId, 'ABSENT')}
                                 disabled={attendance.status === 'ABSENT'}
                               >
                                 Absent
                               </Button>
                               <Button 
                                 variant="outline-info" 
-                                onClick={() => updateAttendanceStatus(attendance.id, 'LEAVE')}
+                                onClick={() => updateAttendanceStatus(attendance.employeeId, 'LEAVE')}
                                 disabled={attendance.status === 'LEAVE'}
                               >
                                 Leave

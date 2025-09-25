@@ -17,14 +17,14 @@ const EmployeeLeavePage = () => {
     const navigate = useNavigate();
     const employeeName = localStorage.getItem('userName') || 'Employee';
 
-    const API_BASE_URL = 'http://localhost:8080';
+    const baseUrl = `${import.meta.env.VITE_API_URL}`;
     
     // Fetch employee's leave requests
     useEffect(() => {
         // We can trust that employeeId exists here because of the ProtectedRoute.
         const fetchLeaveRequests = async () => {
             try {
-                const response = await axios.get(`${API_BASE_URL}/api/leave-requests/employee/${employeeId}`);
+                const response = await axios.get(`${baseUrl}/api/leave-requests/employee/${employeeId}`);
                 setLeaveRequests(response.data);
             } catch {
                 setError('Failed to fetch leave requests');
@@ -55,7 +55,7 @@ const EmployeeLeavePage = () => {
             params.append('endDate', formData.endDate);
             params.append('description', formData.description);
 
-            const response = await axios.post(`${API_BASE_URL}/api/leave-requests`, params, {
+            const response = await axios.post(`${baseUrl}/api/leave-requests`, params, {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }

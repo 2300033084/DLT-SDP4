@@ -11,12 +11,12 @@ const SuperAdminAnnouncements = () => {
     const [error, setError] = useState(null);
     const [formData, setFormData] = useState({ title: "", content: "" });
     const navigate = useNavigate();
-    const API_BASE_URL = 'http://localhost:8080';
+    const baseUrl = `${import.meta.env.VITE_API_URL}`;
 
     const fetchAnnouncements = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`${API_BASE_URL}/api/announcements`);
+            const response = await axios.get(`${baseUrl}/api/announcements`);
             setAnnouncements(response.data);
         } catch (err) {
             console.error("Error fetching announcements:", err);
@@ -34,7 +34,7 @@ const SuperAdminAnnouncements = () => {
         e.preventDefault();
         setError(null);
         try {
-            await axios.post(`${API_BASE_URL}/api/announcements/create`, formData);
+            await axios.post(`${baseUrl}/api/announcements/create`, formData);
             fetchAnnouncements(); // Refresh the list
             setFormData({ title: "", content: "" }); // Clear the form
             alert("Announcement created successfully!");

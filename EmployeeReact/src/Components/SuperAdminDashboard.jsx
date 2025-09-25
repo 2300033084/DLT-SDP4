@@ -19,11 +19,12 @@ const SuperAdminDashboard = () => {
         password: "",
     });
     const navigate = useNavigate();
+    const baseUrl = `${import.meta.env.VITE_API_URL}`;
 
     const fetchManagers = async () => {
         try {
             setLoading(true);
-            const response = await axios.get("http://localhost:8080/manager/allManagers");
+            const response = await axios.get(`${baseUrl}/manager/allManagers`);
             setManagers(response.data);
             setLoading(false);
         } catch (err) {
@@ -58,7 +59,7 @@ const SuperAdminDashboard = () => {
     const handleDeleteManager = async (id) => {
         if (window.confirm("Are you sure you want to delete this manager?")) {
             try {
-                await axios.delete(`http://localhost:8080/managers/delete/${id}`);
+                await axios.delete(`${baseUrl}/managers/delete/${id}`);
                 fetchManagers();
             } catch (err) {
                 console.error("Error deleting manager:", err);
@@ -72,14 +73,14 @@ const SuperAdminDashboard = () => {
         setError(null);
         try {
             if (modalMode === "add") {
-                await axios.post("http://localhost:8080/manager/addManager", {
+                await axios.post(`${baseUrl}/manager/addManager`, {
                     name: formData.name,
                     org: formData.org,
                     email: formData.email,
                     password: formData.password,
                 });
             } else {
-                await axios.put(`http://localhost:8080/manager/update/${formData.id}`, {
+                await axios.put(`${baseUrl}/manager/update/${formData.id}`, {
                     name: formData.name,
                     org: formData.org,
                     email: formData.email,

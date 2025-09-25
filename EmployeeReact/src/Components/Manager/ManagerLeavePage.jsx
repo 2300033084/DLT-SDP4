@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Container, 
   Row, 
@@ -12,61 +12,102 @@ import {
   Nav,
   Spinner
 } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import './ManagerDashboard.css';
 
 const ManagerLeavePage = () => {
   const [leaveRequests, setLeaveRequests] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [filter, setFilter] = useState('PENDING');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(true);
+  
   const navigate = useNavigate();
-  const managerName = localStorage.getItem("managerName") || "Manager";
+  const location = useLocation();
+  const managerId = localStorage.getItem("managerId");
+  const managerName = localStorage.getItem("userName") || "Manager";
+  
+  // Use environment variable for the base API URL
+  const baseUrl = import.meta.env.VITE_API_URL;
 
-  // Fetch leave requests based on filter
-  useEffect(() => {
-    const fetchLeaveRequests = async () => {
+  const getLinkClass = (path) =>
+    `text-white hover-bg-primary-dark rounded ${
+      location.pathname === path ? "active bg-primary-dark" : ""
+    }`;
+
+  const fetchEmployees = async () => {
       try {
-        const managerId = localStorage.getItem("managerId");
-        if (!managerId) {
-          navigate("/login");
-          return;
-        }
-
-        setLoading(true);
-              const url = filter === 'ALL' 
-          ? '/api/leave-requests' 
-          : `/api/leave-requests/status/${filter}`;
-        
-        const response = await axios.get(url);
-        if (Array.isArray(response.data)) {
-          setLeaveRequests(response.data);
-        } else {
-          setLeaveRequests([]);
-        }
+          const res = await axios.get(`${baseUrl}/api/employees/byManager/${managerId}`);
+          setEmployees(res.data);
+          return res.data;
       } catch (err) {
-        setError('Failed to fetch leave requests');
-        console.error(err);
-      } finally {
-        setLoading(false);
+          console.error("Error fetching employees for manager:", err);
+          return [];
       }
-    };
+  };
+
+  const fetchLeaveRequests = async () => {
+    try {
+      if (!managerId) {
+        navigate("/login");
+        return;
+      }
+
+      setLoading(true);
+      setError('');
+      setSuccess('');
+      
+      const allEmployees = await fetchEmployees(); // Fetch employees first to filter later
+      const employeeIds = allEmployees.map(emp => emp.id);
+
+      const url = filter === 'ALL' 
+        ? `${baseUrl}/api/leave-requests` 
+        : `${baseUrl}/api/leave-requests/status/${filter}`;
+      
+      const response = await axios.get(url);
+      
+      const allLeaveRequests = Array.isArray(response.data) ? response.data : [];
+      
+      // Filter leave requests to only show those from the current manager's team
+      const filteredLeaveRequests = allLeaveRequests.filter(req => 
+        employeeIds.includes(req.employee.id)
+      );
+
+      // Add employee name to each request for display purposes
+      const leaveRequestsWithNames = filteredLeaveRequests.map(req => {
+          const employee = allEmployees.find(emp => emp.id === req.employee.id);
+          return { ...req, employeeName: employee ? employee.name : `Employee #${req.employee.id}` };
+      });
+
+      setLeaveRequests(leaveRequestsWithNames);
+
+    } catch (err) {
+      console.error("Error fetching leave requests:", err);
+      setError('Failed to fetch leave requests');
+      setLeaveRequests([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchLeaveRequests();
-  }, [filter, navigate]);
+  }, [filter, managerId, navigate]);
 
   const handleStatusChange = async (id, status) => {
     setError('');
     setSuccess('');
 
     try {
-      await axios.put(`/api/leave-requests/${id}/status?status=${status}`);
-      setLeaveRequests(leaveRequests.map(request => 
-        request.id === id ? { ...request, status } : request
-      ));
+      // Use the base URL for the API endpoint
+      await axios.put(`${baseUrl}/api/leave-requests/${id}/status?status=${status}`);
       setSuccess(`Leave request ${status.toLowerCase()} successfully!`);
-    } catch {
+      fetchLeaveRequests(); // Refresh the list
+    } catch (err) {
+      console.error("Error updating leave request status:", err);
       setError(`Failed to ${status.toLowerCase()} leave request`);
     }
   };
@@ -80,14 +121,16 @@ const ManagerLeavePage = () => {
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('en-US', options);
   };
+  
+  const pendingCount = leaveRequests.filter(r => r.status === 'PENDING').length;
 
   return (
     <Container fluid className="dashboard-container">
       <Row className="g-0">
-        {/* Sidebar - Same as Dashboard */}
+        {/* Sidebar */}
         <Col md={2} className="sidebar bg-primary text-white vh-100 sticky-top">
           <div className="sidebar-header p-4 text-center">
-            <h4 className="text-white">HR Portal</h4>
+            <h4 className="text-white">Manager Portal</h4>
             <div className="employee-info mt-4">
               <div 
                 className="avatar bg-white text-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
@@ -102,28 +145,29 @@ const ManagerLeavePage = () => {
 
           <Nav className="flex-column p-3">
             <Nav.Item className="mb-2">
-              <Nav.Link as={Link} to="/managerdashboard" className="text-white hover-bg-primary-dark rounded">
+              <Nav.Link as={Link} to="/managerdashboard" className={getLinkClass("/managerdashboard")}>
                 <i className="bi bi-speedometer2 me-2"></i>Dashboard
               </Nav.Link>
             </Nav.Item>
             <Nav.Item className="mb-2">
-              <Nav.Link as={Link} to="/leave/approvals" className="text-white active bg-primary-dark rounded">
+              <Nav.Link as={Link} to="/leave/approvals" className={getLinkClass("/leave/approvals")}>
                 <i className="bi bi-calendar-event me-2"></i>Leave Approvals
+                 {pendingCount > 0 && <Badge pill bg="danger" className="ms-2">{pendingCount}</Badge>}
               </Nav.Link>
             </Nav.Item>
             <Nav.Item className="mb-2">
-              <Nav.Link as={Link} to="/attendance/manage" className="text-white hover-bg-primary-dark rounded">
+              <Nav.Link as={Link} to="/attendance/manage" className={getLinkClass("/attendance/manage")}>
                 <i className="bi bi-clock-history me-2"></i>Attendance
               </Nav.Link>
             </Nav.Item>
             <Nav.Item className="mb-2">
-              <Nav.Link href="#" className="text-white hover-bg-primary-dark rounded">
-                <i className="bi bi-people-fill me-2"></i>Team Management
+              <Nav.Link as={Link} to="/manager/tasks" className={getLinkClass("/manager/tasks")}>
+                <i className="bi bi-list-task me-2"></i>Task Management
               </Nav.Link>
             </Nav.Item>
             <Nav.Item className="mb-2">
-              <Nav.Link href="#" className="text-white hover-bg-primary-dark rounded">
-                <i className="bi bi-graph-up me-2"></i>Reports
+              <Nav.Link as={Link} to="#" className={getLinkClass("#")}>
+                <i className="bi bi-people-fill me-2"></i>Team Management
               </Nav.Link>
             </Nav.Item>
             <Nav.Item className="mt-4">
@@ -141,120 +185,94 @@ const ManagerLeavePage = () => {
 
         {/* Main Content Area */}
         <Col md={10} className="main-content p-4 bg-light">
-          {/* Top Navigation */}
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h2 className="text-primary">Leave Approvals</h2>
-            <div className="d-flex align-items-center">
-              <Button variant="outline-primary" size="sm" className="me-2">
-                <i className="bi bi-bell-fill"></i>
-              </Button>
-              <Button variant="outline-primary" size="sm" className="me-3">
-                <i className="bi bi-envelope-fill"></i>
-              </Button>
-              <span className="text-muted">
-                {new Date().toLocaleDateString("en-US", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </span>
-            </div>
           </div>
 
-          {/* Filter and Status Cards */}
           <Row className="mb-4 g-3">
             <Col md={12}>
-              <div>
-                <Card.Body style={{ padding: '1.5rem', marginLeft:"200px", maxHeight: '100px',maxWidth: '800px' }}>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <ButtonGroup>
-                      <Button 
-                        variant={filter === 'PENDING' ? 'primary' : 'outline-primary'}
-                        onClick={() => setFilter('PENDING')}
-                      >
-                        <i className="bi bi-hourglass-split me-2"></i> Pending
-                      </Button>
-                      <Button 
-                        variant={filter === 'APPROVED' ? 'success' : 'outline-success'}
-                        onClick={() => setFilter('APPROVED')}
-                      >
-                        <i className="bi bi-check-circle me-2"></i> Approved
-                      </Button>
-                      <Button 
-                        variant={filter === 'REJECTED' ? 'danger' : 'outline-danger'}
-                        onClick={() => setFilter('REJECTED')}
-                      >
-                        <i className="bi bi-x-circle me-2"></i> Rejected
-                      </Button>
-                      <Button 
-                        variant={filter === 'ALL' ? 'secondary' : 'outline-secondary'}
-                        onClick={() => setFilter('ALL')}
-                      >
-                        <i className="bi bi-list-ul me-2"></i> All
-                      </Button>
-                    </ButtonGroup>
-                    
-                    <div className="d-flex gap-3">
-                      <div className="text-center">
-                        <small className="text-muted">Total Requests</small>
-                        <h4 className="mb-0">{leaveRequests.length}</h4>
-                      </div>
-                      <div className="text-center">
-                        <small className="text-muted">Pending</small>
-                        <h4 className="mb-0 text-warning">
-                          {leaveRequests.filter(r => r.status === 'PENDING').length}
-                        </h4>
-                      </div>
+              <Card.Body style={{ padding: '1.5rem', maxHeight: '100px',maxWidth: '800px' }}>
+                <div className="d-flex justify-content-between align-items-center">
+                  <ButtonGroup>
+                    <Button 
+                      variant={filter === 'PENDING' ? 'primary' : 'outline-primary'}
+                      onClick={() => setFilter('PENDING')}
+                    >
+                      <i className="bi bi-hourglass-split me-2"></i> Pending
+                    </Button>
+                    <Button 
+                      variant={filter === 'APPROVED' ? 'success' : 'outline-success'}
+                      onClick={() => setFilter('APPROVED')}
+                    >
+                      <i className="bi bi-check-circle me-2"></i> Approved
+                    </Button>
+                    <Button 
+                      variant={filter === 'REJECTED' ? 'danger' : 'outline-danger'}
+                      onClick={() => setFilter('REJECTED')}
+                    >
+                      <i className="bi bi-x-circle me-2"></i> Rejected
+                    </Button>
+                    <Button 
+                      variant={filter === 'ALL' ? 'secondary' : 'outline-secondary'}
+                      onClick={() => setFilter('ALL')}
+                    >
+                      <i className="bi bi-list-ul me-2"></i> All
+                    </Button>
+                  </ButtonGroup>
+                  
+                  <div className="d-flex gap-3">
+                    <div className="text-center">
+                      <small className="text-muted">Total Requests</small>
+                      <h4 className="mb-0">{leaveRequests.length}</h4>
+                    </div>
+                    <div className="text-center">
+                      <small className="text-muted">Pending</small>
+                      <h4 className="mb-0 text-warning">
+                        {pendingCount}
+                      </h4>
                     </div>
                   </div>
-                </Card.Body>
-              </div>
+                </div>
+              </Card.Body>
             </Col>
           </Row>
 
-          {/* Alerts */}
-          <Row className="mb-3">
-            <Col md={12}>
-              {error && (
-                <Alert variant="danger" onClose={() => setError('')} dismissible>
-                  <i className="bi bi-exclamation-triangle-fill me-2"></i>
-                  {error}
-                </Alert>
-              )}
-              {success && (
-                <Alert variant="success" onClose={() => setSuccess('')} dismissible>
-                  <i className="bi bi-check-circle-fill me-2"></i>
-                  {success}
-                </Alert>
-              )}
-            </Col>
-          </Row>
+          {error && (
+            <Alert variant="danger" onClose={() => setError('')} dismissible>
+              <i className="bi bi-exclamation-triangle-fill me-2"></i>
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert variant="success" onClose={() => setSuccess('')} dismissible>
+              <i className="bi bi-check-circle-fill me-2"></i>
+              {success}
+            </Alert>
+          )}
 
-          {/* Leave Requests Table */}
           <Row>
             <Col md={12}>
-    <Card className="shadow-sm border-0" style={{minWidth: "100%"}}>
-      <Card.Body className="p-3" > {/* Changed from p-0 to p-3 */}
-        {loading ? (
-          <div className="text-center py-5">
-            <Spinner animation="border" variant="primary" />
-            <p className="mt-2">Loading leave requests...</p>
-          </div>
-        ) : leaveRequests.length > 0 ? (
-          <div className="table-responsive" style={{ maxHeight: 'calc(100vh - 300px)', overflowY: 'auto' }}>
-            <Table hover className="mb-0" style={{ minWidth: '900px' }}>
-              <thead className="bg-light position-sticky top-0">
-                <tr>
-                  <th style={{ width: '20%' }}>Employee</th>
-                  <th style={{ width: '12%' }}>Leave Type</th>
-                  <th style={{ width: '12%' }}>Start Date</th>
-                  <th style={{ width: '12%' }}>End Date</th>
-                  <th style={{ width: '8%' }}>Days</th>
-                  <th style={{ width: '12%' }}>Status</th>
-                  <th style={{ width: '24%' }}>Actions</th>
-                </tr>
-              </thead>
+              <Card className="shadow-sm border-0">
+                <Card.Body className="p-3">
+                  {loading ? (
+                    <div className="text-center py-5">
+                      <Spinner animation="border" variant="primary" />
+                      <p className="mt-2">Loading leave requests...</p>
+                    </div>
+                  ) : leaveRequests.length > 0 ? (
+                    <div className="table-responsive" style={{ maxHeight: 'calc(100vh - 300px)', overflowY: 'auto' }}>
+                      <Table hover className="mb-0">
+                        <thead className="bg-light position-sticky top-0">
+                          <tr>
+                            <th style={{ width: '20%' }}>Employee</th>
+                            <th style={{ width: '12%' }}>Leave Type</th>
+                            <th style={{ width: '12%' }}>Start Date</th>
+                            <th style={{ width: '12%' }}>End Date</th>
+                            <th style={{ width: '8%' }}>Days</th>
+                            <th style={{ width: '12%' }}>Status</th>
+                            <th style={{ width: '24%' }}>Actions</th>
+                          </tr>
+                        </thead>
                         <tbody>
                           {leaveRequests.map(request => (
                             <tr key={request.id}>
@@ -266,17 +284,15 @@ const ManagerLeavePage = () => {
                                     </span>
                                   </div>
                                   <div>
-                                    <div className="fw-medium">{request.employeeName || `Employee #${request.employeeId}`}</div>
-                                    <small className="text-muted">{request.employeeEmail || ''}</small>
+                                    <div className="fw-medium">{request.employeeName || `Employee #${request.employee.id}`}</div>
                                   </div>
                                 </div>
                               </td>
-                              <td>{request.leaveType || 'N/A'}</td>
+                              <td>{request.description || 'N/A'}</td>
                               <td>{formatDate(request.startDate)}</td>
                               <td>{formatDate(request.endDate)}</td>
-                              <td>{request.days || 
-                                Math.ceil((new Date(request.endDate) - new Date(request.startDate)) / (1000 * 60 * 60 * 24) + 1
-                          )}
+                              <td>
+                                {Math.ceil((new Date(request.endDate) - new Date(request.startDate)) / (1000 * 60 * 60 * 24) + 1)}
                               </td>
                               <td>
                                 <Badge 
@@ -337,3 +353,4 @@ const ManagerLeavePage = () => {
 };
 
 export default ManagerLeavePage;
+c

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import HomeNavbar from "../NavBars/HomeNavbar";
 import "../css/SignupForm.css";
 
+const baseUrl = `${import.meta.env.VITE_API_URL}`;
+
 const SignupForm = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -29,7 +31,7 @@ const SignupForm = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:8080/manager/addManager", {
+      const response = await fetch(`${baseUrl}/manager/addManager`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

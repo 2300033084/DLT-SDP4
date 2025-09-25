@@ -8,10 +8,11 @@ const AddEmployee = ({ managerId }) => {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
+  const baseUrl = `${import.meta.env.VITE_API_URL}`;
   const handleAddEmployee = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:8080/employees/addEmployee?managerId=${managerId}`,
+        `${baseUrl}//employees/addEmployee?managerId=${managerId}`,
         {
           name,
           email,
