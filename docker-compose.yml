@@ -11,7 +11,7 @@ services:
       MYSQL_DATABASE: ems
     ports:
       # Map container port 3306 to host port 3306
-      - "3306:3306" 
+      - "3307:3306" 
     volumes:
       # Persistent volume for MySQL data
       - mysql_data:/var/lib/mysql
