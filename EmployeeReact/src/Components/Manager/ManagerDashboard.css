@@ -140,3 +140,8 @@
     transform: translateX(0);
   }
 }
+/* Add this to ManagerDashboard.css or a similar shared CSS file */
+.sidebar-footer {
+  margin-top: auto; /* Pushes the element to the bottom of the flex container */
+  padding-top: 1rem;
+}

@@ -82,7 +82,7 @@ const EmployeeLeavePage = () => {
                 {/* Sidebar */}
                 <Col md={2} className="sidebar bg-dark text-white vh-100 sticky-top">
                     <div className="sidebar-header p-3 text-center">
-                        <h4>HR Portal</h4>
+                        <h4>Employee Portal</h4>
                         <div className="employee-info mt-3">
                             <div className="avatar bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" 
                                 style={{ width: '60px', height: '60px' }}>

@@ -10,7 +10,7 @@ import {
   Button,
   Badge,
 } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import AddEmployee from "../Manager/AddEmployee";
 import "./ManagerDashboard.css";
@@ -25,7 +25,9 @@ const ManagerDashboard = () => {
     recentLeaves: [],
   });
   const navigate = useNavigate();
+  const location = useLocation();
   const managerName = localStorage.getItem("userName") || "Manager";
+  const API_BASE_URL = 'http://localhost:8080';
 
   useEffect(() => {
     const storedManagerId = localStorage.getItem("managerId");
@@ -41,7 +43,7 @@ const ManagerDashboard = () => {
   const fetchEmployees = async (id) => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/employees/byManager/${id}`
+        `${API_BASE_URL}/employees/byManager/${id}`
       );
       setEmployees(response.data);
       setLoading(false);
@@ -54,14 +56,19 @@ const ManagerDashboard = () => {
   const fetchDashboardStats = async (id) => {
     try {
       const [employeesRes, leavesRes] = await Promise.all([
-        axios.get(`http://localhost:8080/employees/count/byManager/${id}`),
-        axios.get(`http://localhost:8080/leave-requests/pending/byManager/${id}`),
+        axios.get(`${API_BASE_URL}/employees/byManager/${id}`), // Correct endpoint
+        axios.get(`${API_BASE_URL}/api/leave-requests/status/PENDING`),
       ]);
 
+      const employeesInTeam = employeesRes.data.filter(emp => emp.manager.id == id);
+      const pendingLeavesForTeam = leavesRes.data.filter(leave => 
+        employeesInTeam.some(emp => emp.id === leave.employee.id)
+      );
+      
       setStats({
-        totalEmployees: employeesRes.data.count,
-        pendingLeaves: leavesRes.data.length,
-        recentLeaves: leavesRes.data.slice(0, 3),
+        totalEmployees: employeesInTeam.length,
+        pendingLeaves: pendingLeavesForTeam.length,
+        recentLeaves: pendingLeavesForTeam.slice(0, 3),
       });
     } catch (error) {
       console.error("Error fetching stats:", error);
@@ -94,12 +101,12 @@ const ManagerDashboard = () => {
 
           <Nav className="flex-column p-3">
             <Nav.Item className="mb-2">
-              <Nav.Link as={Link} to="/managerdashboard" className="text-white active bg-primary-dark rounded">
+              <Nav.Link as={Link} to="/managerdashboard" className={`text-white hover-bg-primary-dark rounded ${location.pathname === '/managerdashboard' ? 'active bg-primary-dark' : ''}`}>
                 <i className="bi bi-speedometer2 me-2"></i>Dashboard
               </Nav.Link>
             </Nav.Item>
             <Nav.Item className="mb-2">
-              <Nav.Link as={Link} to="/leave/approvals" className="text-white hover-bg-primary-dark rounded">
+              <Nav.Link as={Link} to="/leave/approvals" className={`text-white hover-bg-primary-dark rounded ${location.pathname === '/leave/approvals' ? 'active bg-primary-dark' : ''}`}>
                 <i className="bi bi-calendar-event me-2"></i>Leave Approvals
                 {stats.pendingLeaves > 0 && (
                   <Badge pill bg="danger" className="ms-2">
@@ -109,18 +116,19 @@ const ManagerDashboard = () => {
               </Nav.Link>
             </Nav.Item>
             <Nav.Item className="mb-2">
-              <Nav.Link as={Link} to="/attendance/manage" className="text-white hover-bg-primary-dark rounded">
+              <Nav.Link as={Link} to="/attendance/manage" className={`text-white hover-bg-primary-dark rounded ${location.pathname === '/attendance/manage' ? 'active bg-primary-dark' : ''}`}>
                 <i className="bi bi-clock-history me-2"></i>Attendance
               </Nav.Link>
             </Nav.Item>
+            {/* New Nav.Item for Task Management */}
             <Nav.Item className="mb-2">
-              <Nav.Link href="#" className="text-white hover-bg-primary-dark rounded">
-                <i className="bi bi-people-fill me-2"></i>Team Management
+              <Nav.Link as={Link} to="/manager/tasks" className={`text-white hover-bg-primary-dark rounded ${location.pathname === '/manager/tasks' ? 'active bg-primary-dark' : ''}`}>
+                <i className="bi bi-list-task me-2"></i>Task Management
               </Nav.Link>
             </Nav.Item>
             <Nav.Item className="mb-2">
-              <Nav.Link href="#" className="text-white hover-bg-primary-dark rounded">
-                <i className="bi bi-graph-up me-2"></i>Reports
+              <Nav.Link as={Link} to="#" className="text-white hover-bg-primary-dark rounded">
+                <i className="bi bi-people-fill me-2"></i>Team Management
               </Nav.Link>
             </Nav.Item>
             <Nav.Item className="mt-4">
@@ -258,11 +266,9 @@ const ManagerDashboard = () => {
             <Col md={6}>
               <Card className="shadow-sm h-100" style={{ height: "400px", width: "100%" }}>
                 <Card.Header className="bg-white border-0 d-flex justify-content-between align-items-center" style={{marginRight: "20px"}}>
-                  
+                  <h5 className="mb-0">Your Team</h5>
                   <AddEmployee managerId={managerId} onEmployeeAdded={fetchEmployees} />
-                  
                 </Card.Header>
-                <h5 className="mb-0">Your Team</h5>
                 <Card.Body>
                   {loading ? (
                     <div className="text-center py-4">

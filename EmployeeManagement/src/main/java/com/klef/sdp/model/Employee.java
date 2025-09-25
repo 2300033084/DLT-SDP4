@@ -105,10 +105,10 @@ public class Employee {
 	public void setAttendanceRecords(List<Attendance> attendanceRecords) {
 		this.attendanceRecords = attendanceRecords;
 	}
-	public void setStatus(java.io.ObjectInputFilter.Status status2) {
+	/*public void setStatus(java.io.ObjectInputFilter.Status status2) {
 		// TODO Auto-generated method stub
 		this.status = status;
-	}
+	}*/
 		
 		
 	

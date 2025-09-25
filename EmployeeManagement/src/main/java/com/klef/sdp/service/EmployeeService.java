@@ -10,6 +10,8 @@ import com.klef.sdp.model.Employee;
 import com.klef.sdp.model.Manager;
 import com.klef.sdp.repository.EmployeeRepo;
 import com.klef.sdp.repository.ManagerRepo;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.Optional;
 
 
 
@@ -31,10 +33,11 @@ public class EmployeeService {
     public List<Employee> getEmployeesByManager(Long managerId) {
         return repo.findByManagerId(managerId);
     }
-    public Employee updateEmployeeStatus(Long id, Status status) {  // Change String to Status
+    @Transactional
+    public Employee updateEmployeeStatus(Long id, com.klef.sdp.enums.Status status) {  // Change String to Status
         Employee employee = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
-        employee.setStatus(status);  // Directly setting Status enum
+        employee.setStatus(status);  
         return repo.save(employee);
     }
 
@@ -46,6 +49,30 @@ public class EmployeeService {
 	public Employee findByEmail(String email) {
 	    return repo.findByEmail(email);
 	}
+    @Transactional(readOnly = true)
+    public Optional<Employee> getEmployeeById(Long id) {
+        return repo.findById(id);
+    }
+    
+    // --- NEW METHOD: Update Employee Profile ---
+    @Transactional
+    public Employee updateEmployeeProfile(Long id, Employee employeeDetails) {
+        Employee existingEmployee = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
+        
+        // Update fields an employee can change
+        existingEmployee.setName(employeeDetails.getName());
+        
+        // Only update password if a new one is provided
+        if (employeeDetails.getPassword() != null && !employeeDetails.getPassword().isEmpty()) {
+            existingEmployee.setPassword(employeeDetails.getPassword());
+        }
+        
+        return repo.save(existingEmployee);
+    }
+    
+
+	
 
 
 	

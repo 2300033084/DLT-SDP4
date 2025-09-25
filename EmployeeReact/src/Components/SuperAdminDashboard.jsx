@@ -23,7 +23,7 @@ const SuperAdminDashboard = () => {
     const fetchManagers = async () => {
         try {
             setLoading(true);
-            const response = await axios.get("http://localhost:8080/managers/allManagers");
+            const response = await axios.get("http://localhost:8080/manager/allManagers");
             setManagers(response.data);
             setLoading(false);
         } catch (err) {
@@ -62,7 +62,7 @@ const SuperAdminDashboard = () => {
                 fetchManagers();
             } catch (err) {
                 console.error("Error deleting manager:", err);
-                setError("Failed to delete manager.");
+                alert("Failed to delete manager.");
             }
         }
     };
@@ -72,14 +72,14 @@ const SuperAdminDashboard = () => {
         setError(null);
         try {
             if (modalMode === "add") {
-                await axios.post("http://localhost:8080/managers/addManager", {
+                await axios.post("http://localhost:8080/manager/addManager", {
                     name: formData.name,
                     org: formData.org,
                     email: formData.email,
                     password: formData.password,
                 });
             } else {
-                await axios.put(`http://localhost:8080/managers/update/${formData.id}`, {
+                await axios.put(`http://localhost:8080/manager/update/${formData.id}`, {
                     name: formData.name,
                     org: formData.org,
                     email: formData.email,
@@ -110,7 +110,18 @@ const SuperAdminDashboard = () => {
                     <Nav className="flex-column p-3">
                         <Nav.Item className="mb-2">
                             <Nav.Link as={Link} to="/superadmindashboard" className="text-white active bg-primary-dark rounded">
-                                <i className="bi bi-speedometer2 me-2"></i>Dashboard
+                                <i className="bi bi-person-gear me-2"></i>Manager Management
+                            </Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item className="mb-2">
+                            <Nav.Link as={Link} to="/superadmin/employees" className="text-white hover-bg-primary-dark rounded">
+                                <i className="bi bi-people-fill me-2"></i>Employee Management
+                            </Nav.Link>
+                        </Nav.Item>
+                        {/* New Nav.Item for Announcements */}
+                        <Nav.Item className="mb-2">
+                            <Nav.Link as={Link} to="/superadmin/announcements" className="text-white hover-bg-primary-dark rounded">
+                                <i className="bi bi-megaphone me-2"></i>Announcements
                             </Nav.Link>
                         </Nav.Item>
                         <Nav.Item className="mt-4">

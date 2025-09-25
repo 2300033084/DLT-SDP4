@@ -8,11 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.Optional;
 
 
 import com.klef.sdp.model.Manager;
@@ -51,6 +54,30 @@ public class ManagerController {
         response.put("email", manager.getEmail());
 
         return ResponseEntity.ok(response);
+    }
+    @PutMapping("/profile/{id}")
+    public ResponseEntity<Manager> updateManagerProfile(
+            @PathVariable Long id,
+            @RequestBody Manager managerDetails) {
+        
+        Manager existingManager = service.findById(id);
+        
+        if (existingManager == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        // Update allowed fields
+        existingManager.setName(managerDetails.getName());
+        
+        // Only update password if a new one is provided
+        if (managerDetails.getPassword() != null && !managerDetails.getPassword().isEmpty()) {
+            existingManager.setPassword(managerDetails.getPassword());
+        }
+        
+        // Save the updated manager (reusing existing update method)
+        service.updateManager(existingManager);
+        
+        return ResponseEntity.ok(existingManager);
     }
 
 

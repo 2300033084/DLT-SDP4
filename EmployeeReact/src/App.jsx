@@ -11,6 +11,11 @@ import ManagerAttendancePage from "./Components/Manager/ManagerAttendancePage";
 import EmployeeLeavePage from "./Components/Employee/EmployeeLeavePage";
 import EmployeeAttendancePage from "./Components/Employee/EmployeeAttendancePage";
 import EmployeePayrollPage from "./Components/Employee/EmployeePayrollPage";
+import ProfilePage from "./Components/ProfilePage";
+import SuperAdminEmployeeManagement from "./Components/SuperAdminEmployeeManagement";
+import SuperAdminAnnouncements from "./Components/SuperAdminAnnouncements";
+import ManagerTaskAssignment from "./Components/Manager/ManagerTaskAssignment";
+import EmployeeTaskView from "./Components/Employee/EmployeeTaskView";
 
 const ProtectedRoute = ({ allowedRoles }) => {
   const userRole = localStorage.getItem("role");
@@ -54,6 +59,8 @@ function App() {
           <Route path="/managerdashboard" element={<ManagerDashboard />} />
           <Route path="/leave/approvals" element={<ManagerLeavePage />} />
           <Route path="/attendance/manage" element={<ManagerAttendancePage />} />
+          <Route path="/managerprofile" element={<ProfilePage />} />
+          <Route path="/manager/tasks" element={<ManagerTaskAssignment />} />
         </Route>
 
         {/* Routes accessible by Employee and Super Admin */}
@@ -62,13 +69,16 @@ function App() {
           <Route path="/leave" element={<EmployeeLeavePage />} />
           <Route path="/attendance" element={<EmployeeAttendancePage />} />
           <Route path="/payroll" element={<EmployeePayrollPage />} />
-          <Route path="/profile" element={<div>Employee Profile Page (To be implemented)</div>} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/tasks" element={<EmployeeTaskView />} />
           <Route path="/documents" element={<div>Employee Documents Page (To be implemented)</div>} />
         </Route>
         
         {/* Routes accessible only by Super Admin */}
         <Route element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]} />}>
           <Route path="/superadmindashboard" element={<SuperAdminDashboard />} />
+          <Route path="/superadmin/employees" element={<SuperAdminEmployeeManagement />} />
+          <Route path="/superadmin/announcements" element={<SuperAdminAnnouncements />} />
         </Route>
 
         {/* Fallback for any other path */}

@@ -1,0 +1,104 @@
+/* Base Colors for Employee Dashboard */
+:root {
+  --primary: #0d6efd;
+  --dark: #212529;
+  --gray: #6c757d;
+  --gray-light: #e9ecef;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+  min-height: 100vh;
+  background-color: var(--gray-light);
+}
+
+/* Sidebar Styling */
+.sidebar {
+  background: var(--dark); /* Use dark background as in your code */
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar .nav-link {
+  padding: 0.75rem 1rem;
+  transition: all 0.2s;
+  margin-bottom: 0.25rem;
+  border-radius: 6px;
+  color: white;
+}
+
+.sidebar .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.sidebar .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.25);
+  font-weight: 500;
+}
+
+.sidebar .sidebar-header {
+  padding: 1.5rem 1rem;
+}
+
+.sidebar .employee-info .avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--primary);
+  color: white;
+  margin: 0 auto 0.5rem;
+}
+
+.sidebar .employee-info h6 {
+  color: white;
+  margin-bottom: 0;
+}
+
+.sidebar .employee-info small {
+  color: var(--gray);
+}
+
+.sidebar .nav {
+  flex-grow: 1;
+}
+
+/* Fixes logout button position */
+.sidebar .logout-container {
+  padding: 1rem;
+  margin-top: auto; /* Pushes the button to the bottom */
+}
+
+/* Main Content */
+.main-content {
+  background-color: var(--gray-light);
+  min-height: 100vh;
+}
+
+/* Stats Cards */
+.stat-card {
+  border: none;
+  border-radius: 10px;
+  transition: transform 0.3s;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* General Styles */
+.dashboard-container .btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.dashboard-container .btn-primary:hover {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}

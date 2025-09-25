@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import './EmployeeDashboard.css'; // Import the new CSS file
 
 const EmployeeAttendancePage = () => {
   const [attendances, setAttendances] = useState([]);
@@ -13,38 +14,45 @@ const EmployeeAttendancePage = () => {
   const [viewMode, setViewMode] = useState('daily'); // 'daily' or 'range'
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const employeeId = localStorage.getItem('employeeId'); // Get employeeId once
+  const employeeId = localStorage.getItem('employeeId');
   const navigate = useNavigate();
   const employeeName = localStorage.getItem('userName') || 'Employee';
 
   // Fetch attendance data
   useEffect(() => {
-    // We can trust that employeeId exists here because of the ProtectedRoute.
+    if (!employeeId) {
+      navigate("/login");
+      return;
+    }
     const fetchAttendance = async () => {
       setLoading(true);
       setError('');
       try {
         let response;
+        const API_BASE_URL = 'http://localhost:8080';
         if (viewMode === 'daily') {
           const dateStr = selectedDate.toISOString().split('T')[0];
-          response = await axios.get(`http://localhost:8080/api/attendance/employee/${employeeId}`);
-          // Filter attendance records for the selected date
-          const filtered = response.data.filter(record => record.date === dateStr);
-          setAttendances(filtered);
+          // Correct API endpoint for fetching a single day's attendance
+          response = await axios.get(`${API_BASE_URL}/api/attendance/employee/${employeeId}/date?date=${dateStr}`);
+          // The API returns a single object or null, so we wrap it in an array if it exists.
+          setAttendances(response.data ? [response.data] : []);
         } else {
           const startStr = rangeStart.toISOString().split('T')[0];
           const endStr = rangeEnd.toISOString().split('T')[0];
-          response = await axios.get(`http://localhost:8080/api/attendance/employee/${employeeId}/range?startDate=${startStr}&endDate=${endStr}`);
+          // Correct API endpoint for fetching a date range
+          response = await axios.get(`${API_BASE_URL}/api/attendance/employee/${employeeId}/range?startDate=${startStr}&endDate=${endStr}`);
           setAttendances(response.data);
         }
-      } catch {
+      } catch (err) {
         setError('Failed to fetch attendance records');
+        console.error("Attendance fetch error:", err);
+        setAttendances([]);
       } finally {
         setLoading(false);
       }
     };
     fetchAttendance();
-  }, [employeeId, selectedDate, rangeStart, rangeEnd, viewMode]);
+  }, [employeeId, selectedDate, rangeStart, rangeEnd, viewMode, navigate]);
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -62,7 +70,6 @@ const EmployeeAttendancePage = () => {
 
   return (
     <Container fluid className="dashboard-container px-0">
-      {/* Sidebar and Main Content Layout */}
       <Row className="g-0">
         {/* Sidebar */}
         <Col md={2} className="sidebar bg-dark text-white vh-100 sticky-top">
