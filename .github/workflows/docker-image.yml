@@ -38,7 +38,7 @@ jobs:
           context: ./EmployeeManagement
           file: ./EmployeeManagement/backend.Dockerfile
           push: true
-          tags: ${{ env.DOCKERHUB_USERNAME }}/employee-management-backend:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/employee-management-backend:latest
 
       - name: Build & push frontend
         uses: docker/build-push-action@v5
@@ -46,4 +46,4 @@ jobs:
           context: ./EmployeeReact
           file: ./EmployeeReact/frontend.Dockerfile
           push: true
-          tags: ${{ env.DOCKERHUB_USERNAME }}/employee-management-frontend:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/employee-management-frontend:latest
