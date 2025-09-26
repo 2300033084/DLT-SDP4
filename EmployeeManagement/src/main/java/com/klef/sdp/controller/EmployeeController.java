@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.klef.sdp.model.Employee;
+import com.klef.sdp.model.Manager;
 import com.klef.sdp.service.EmployeeService;
 
 import java.util.List;
@@ -48,5 +49,21 @@ public class EmployeeController {
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build(); 
         }
+    }
+    @PostMapping("/addEmployee")
+    public ResponseEntity<String> addEmployee(@RequestBody Employee employee, @RequestParam Long managerId) {
+        // 1. Fetch Manager to link the relationship and trigger the @PrePersist logic for 'org'
+        Manager manager = employeeService.findManagerById(managerId);
+        if (manager == null) {
+            return ResponseEntity.badRequest().body("Manager not found");
+        }
+        
+        // 2. Set the relationship
+        employee.setManager(manager);
+        
+        // 3. Save the new employee
+        employeeService.addEmployee(employee);
+        
+        return ResponseEntity.ok("Employee added successfully!");
     }
 }
