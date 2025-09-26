@@ -2,43 +2,48 @@ name: Employee Management Docker CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    env:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
     steps:
-      - name: Checkout source code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # Debugging step to verify the username secret
-      - name: Debug Docker Hub Username
-        run: echo "Username is ${{ secrets.DOCKERHUB_USERNAME }}"
+      # Guard: fail early if secrets are missing
+      - name: Verify Docker Hub secrets
+        run: |
+          if [ -z "${DOCKERHUB_USERNAME}" ] || [ -z "${DOCKERHUB_TOKEN}" ]; then
+            echo "❌ Missing DOCKERHUB_USERNAME or DOCKERHUB_TOKEN secrets."; exit 1;
+          fi
 
-      - name: Set up Docker Buildx
+      - name: Set up Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ env.DOCKERHUB_TOKEN }}
 
-      - name: Build and push backend image
+      - name: Build & push backend
         uses: docker/build-push-action@v5
         with:
           context: ./EmployeeManagement
           file: ./EmployeeManagement/backend.Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/employee-management-backend:latest
+          tags: ${{ env.DOCKERHUB_USERNAME }}/employee-management-backend:latest
 
-      - name: Build and push frontend image
+      - name: Build & push frontend
         uses: docker/build-push-action@v5
         with:
           context: ./EmployeeReact
           file: ./EmployeeReact/frontend.Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/employee-management-frontend:latest
+          tags: ${{ env.DOCKERHUB_USERNAME }}/employee-management-frontend:latest

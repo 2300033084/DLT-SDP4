@@ -21,7 +21,7 @@ services:
     container_name: ems-backend
     build:
       context: ./EmployeeManagement
-      dockerfile: backend.Dockerfile
+      dockerfile: ./EmployeeManagement/backend.Dockerfile
     ports:
       - "2025:8080"
     depends_on:
@@ -37,7 +37,7 @@ services:
     container_name: ems-frontend
     build:
       context: ./EmployeeReact
-      dockerfile: frontend.Dockerfile
+      dockerfile: ./EmployeeReact/frontend.Dockerfile
     ports:
       - "3000:80"
     depends_on:
