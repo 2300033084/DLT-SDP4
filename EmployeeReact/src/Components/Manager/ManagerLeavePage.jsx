@@ -353,4 +353,3 @@ const ManagerLeavePage = () => {
 };
 
 export default ManagerLeavePage;
-c
