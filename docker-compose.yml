@@ -1,68 +1,48 @@
-version: '3.8'
-
 services:
-  # 1. MySQL Database Service
   mysqldb:
-    image: mysql:8.0
-    container_name: ems-mysqldb
+    image: mysql:8
+    container_name: mysql-db
     environment:
-      # Database credentials used in Spring Boot application.properties
-      MYSQL_ROOT_PASSWORD: root 
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: ems
     ports:
-      # Map container port 3306 to host port 3306
-      - "3307:3306" 
+      - "3307:3306"
     volumes:
-      # Persistent volume for MySQL data
       - mysql_data:/var/lib/mysql
     networks:
       - ems-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # 2. Spring Boot Backend Service
   backend:
-    # Build using the Dockerfile inside the EmployeeManagement folder
-    build:
-      context: ./EmployeeManagement
-      dockerfile: backend.Dockerfile
+    image: sanjaysammy2005/employee-management-backend:latest
     container_name: ems-backend
     ports:
-      # Map container port 8080 to host port 8080
-      - "8080:8080" 
-    # Must wait for the database to start
+      - "2025:8080"
     depends_on:
-      - mysqldb
+      mysqldb:
+        condition: service_healthy
     restart: on-failure
     networks:
       - ems-network
-    # Expose this internal port to other linked services
-    expose:
-      - "8080"
 
-  # 3. React Frontend Service
   frontend:
-    # Build using the Dockerfile inside the EmployeeReact folder
-    build:
-      context: ./EmployeeReact
-      dockerfile: frontend.Dockerfile
+    image: sanjaysammy2005/employee-management-frontend:latest
     container_name: ems-frontend
     ports:
-      # Map Nginx port 80 to host port 3000
-      - "3000:80" 
+      - "3000:80"
     depends_on:
       - backend
     restart: on-failure
-    # 🔥 Pass the backend service URL to the frontend during the Vite build process.
-    # 'backend' is the service name, and '8080' is its exposed internal port.
-    environment:
-      VITE_API_URL: http://backend:8080
     networks:
       - ems-network
 
-# Define volumes for data persistence
 volumes:
   mysql_data:
 
-# Define a custom network
 networks:
   ems-network:
     driver: bridge
