@@ -20,6 +20,7 @@ services:
   backend:
     container_name: ems-backend
     build:
+      image: yashodhanreddy/employee-management-backend
       # Use the project root as the context
       context: .
       # Path to the Dockerfile is relative to the context
@@ -38,6 +39,7 @@ services:
   frontend:
     container_name: ems-frontend
     build:
+      image: yashodhanreddy/employee-management-frontend
       # Use the project root as the context
       context: .
       # Path to the Dockerfile is relative to the context
