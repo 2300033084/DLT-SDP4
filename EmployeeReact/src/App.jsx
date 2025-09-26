@@ -64,6 +64,7 @@ function App() {
           <Route path="/attendance/manage" element={<ManagerAttendancePage />} />
           <Route path="/managerprofile" element={<ProfilePage />} />
           <Route path="/manager/tasks" element={<ManagerTaskAssignment />} />
+          
         </Route>
 
         {/* Routes accessible by Employee and Super Admin */}
@@ -73,7 +74,9 @@ function App() {
           <Route path="/attendance" element={<EmployeeAttendancePage />} />
           <Route path="/payroll" element={<EmployeePayrollPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/employeeprofile" element={<ProfilePage />} />
           <Route path="/tasks" element={<EmployeeTaskView />} />
+          
           <Route path="/documents" element={<div>Employee Documents Page (To be implemented)</div>} />
         </Route>
         
