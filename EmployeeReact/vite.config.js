@@ -3,11 +3,10 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  // Set the base path for your application in the Docker container
-  // CHANGE THIS: Use './' (relative path) instead of '/' (absolute path)
-  base: './', // <-- UPDATED LINE
+  // Keep the relative base path fix for Nginx
+  base: './', 
   build: {
-    // This setting ensures that the output is compatible with older browsers if needed
-    target: 'es2020',
+    // REMOVE THIS LINE (or comment it out) to fix the minification error
+    // target: 'es2020', 
   }
 });
