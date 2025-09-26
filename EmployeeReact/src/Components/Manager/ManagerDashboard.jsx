@@ -44,7 +44,7 @@ const ManagerDashboard = () => {
   const fetchEmployees = async (id) => {
     try {
       const response = await axios.get(
-        `${baseUrl}/employees/byManager/${id}`
+        `${baseUrl}/api/employees/byManager/${id}`
       );
       setEmployees(response.data);
       setLoading(false);
@@ -57,7 +57,7 @@ const ManagerDashboard = () => {
   const fetchDashboardStats = async (id) => {
     try {
       const [employeesRes, leavesRes] = await Promise.all([
-        axios.get(`${baseUrl}/employees/byManager/${id}`), // Correct endpoint
+        axios.get(`${baseUrl}/api/employees/byManager/${id}`), // Correct endpoint
         axios.get(`${baseUrl}/api/leave-requests/status/PENDING`),
       ]);
 
