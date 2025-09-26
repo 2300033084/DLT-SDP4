@@ -28,7 +28,8 @@ jobs:
         with:
           # Context is the directory of your backend source code
           context: ./EmployeeManagement
-          file: ../SDP-FULLSTACK/backend.Dockerfile
+          # Corrected path to the Dockerfile
+          file: ./SDP-FULLSTACK/backend.Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/employee-management-backend:latest
 
@@ -36,6 +37,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./EmployeeReact
-          file: ../SDP-FULLSTACK/frontend.Dockerfile
+          # Corrected path to the Dockerfile
+          file: ./SDP-FULLSTACK/frontend.Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/employee-management-frontend:latest
