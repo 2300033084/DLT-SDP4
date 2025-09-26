@@ -21,7 +21,7 @@ import com.klef.sdp.enums.AttendanceStatus;
 import com.klef.sdp.model.Attendance;
 import com.klef.sdp.service.AttendanceService;
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/attendance")
 public class AttendanceController {

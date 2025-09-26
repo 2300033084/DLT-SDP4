@@ -16,6 +16,7 @@ import SuperAdminEmployeeManagement from "./Components/SuperAdminEmployeeManagem
 import SuperAdminAnnouncements from "./Components/SuperAdminAnnouncements";
 import ManagerTaskAssignment from "./Components/Manager/ManagerTaskAssignment";
 import EmployeeTaskView from "./Components/Employee/EmployeeTaskView";
+import DockerTest from "./Components/DockerTest";
 
 const ProtectedRoute = ({ allowedRoles }) => {
   const userRole = localStorage.getItem("role");
@@ -53,6 +54,8 @@ function App() {
         <Route path="/login" element={<LoginForm />} />
         <Route path="/signup" element={<SignupForm />} />
         <Route path="/access-denied" element={<AccessDenied />} />
+        <Route path="/docker-test" element={<DockerTest />} />
+
 
         {/* Routes accessible by Manager and Super Admin */}
         <Route element={<ProtectedRoute allowedRoles={["MANAGER", "SUPER_ADMIN"]} />}>
