@@ -12,7 +12,7 @@ const AddEmployee = ({ managerId }) => {
   const handleAddEmployee = async () => {
     try {
       const response = await axios.post(
-        `${baseUrl}//employees/addEmployee?managerId=${managerId}`,
+        `${baseUrl}/employees/addEmployee?managerId=${managerId}`,
         {
           name,
           email,
