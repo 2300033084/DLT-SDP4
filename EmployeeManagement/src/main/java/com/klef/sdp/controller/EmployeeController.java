@@ -19,6 +19,11 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
     // Endpoint to fetch all employees under a specific manager
+    @GetMapping("/docker")
+    public String dockerTest()
+    {
+        return "Docker is working fine";
+    }
     @GetMapping("/byManager/{managerId}")
     public ResponseEntity<List<Employee>> getEmployeesByManager(@PathVariable Long managerId) {
         List<Employee> employees = employeeService.getEmployeesByManager(managerId);
