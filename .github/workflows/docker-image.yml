@@ -26,9 +26,9 @@ jobs:
       - name: Build and push backend image
         uses: docker/build-push-action@v5
         with:
-          # Context is the directory of your backend source code
-          context: ./EmployeeManagement
-          # Corrected path to the Dockerfile
+          # Context is the project root, which contains all subdirectories
+          context: .
+          # The path to the Dockerfile is relative to the project root
           file: ./SDP-FULLSTACK/backend.Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/employee-management-backend:latest
@@ -36,8 +36,9 @@ jobs:
       - name: Build and push frontend image
         uses: docker/build-push-action@v5
         with:
-          context: ./EmployeeReact
-          # Corrected path to the Dockerfile
+          # Context is the project root
+          context: .
+          # The path to the Dockerfile is relative to the project root
           file: ./SDP-FULLSTACK/frontend.Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/employee-management-frontend:latest
