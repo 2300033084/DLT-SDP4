@@ -21,7 +21,7 @@ services:
     container_name: ems-backend
     build:
       context: ./EmployeeManagement
-      dockerfile: ./EmployeeManagement/backend.Dockerfile
+      dockerfile: ./SDP-FULLSTACK/backend.Dockerfile
     ports:
       - "2025:8080"
     depends_on:
@@ -37,7 +37,7 @@ services:
     container_name: ems-frontend
     build:
       context: ./EmployeeReact
-      dockerfile: ./EmployeeReact/frontend.Dockerfile
+      dockerfile: ./SDP-FULLSTACK/frontend.Dockerfile
     ports:
       - "3000:80"
     depends_on:

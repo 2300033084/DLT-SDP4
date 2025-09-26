@@ -3,13 +3,13 @@ FROM node:20-alpine AS build
 WORKDIR /app
 
 # Context is project root, so paths include the folder names
-COPY SDP-Frontend/package*.json ./
+COPY EmployeeReact/package*.json ./
 RUN npm install
 
 # Optional: may not exist in all installs; ignore failure
 RUN chmod +x node_modules/.bin/vite || true
 
-COPY SDP-Frontend/ ./
+COPY EmployeeReact/ ./
 RUN npm run build
 
 # Stage 2: Serve with nginx
