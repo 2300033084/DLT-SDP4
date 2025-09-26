@@ -28,7 +28,7 @@ public class TaskService {
     }
     
     public List<Task> getTasksByEmployeeId(Long employeeId) {
-        return taskRepository.findByEmployeeId(employeeId);
+        return taskRepository.findByEmployee_Id(employeeId);
     }
 
     public Task assignTaskToEmployee(Long employeeId, Task taskDetails) {

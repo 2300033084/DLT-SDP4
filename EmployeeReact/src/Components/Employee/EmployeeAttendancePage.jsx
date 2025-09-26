@@ -6,19 +6,20 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './EmployeeDashboard.css'; // Import the new CSS file
 
-const baseUrl = `${import.meta.env.VITE_API_URL}`;
 
 const EmployeeAttendancePage = () => {
   const [attendances, setAttendances] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [rangeStart, setRangeStart] = useState(new Date(new Date().setMonth(new Date().getMonth() - 1)));
   const [rangeEnd, setRangeEnd] = useState(new Date());
-  const [viewMode, setViewMode] = useState('daily'); // 'daily' or 'range'
+  const [viewMode, setViewMode] = useState('range'); // 'daily' or 'range'
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const employeeId = localStorage.getItem('employeeId');
   const navigate = useNavigate();
   const employeeName = localStorage.getItem('userName') || 'Employee';
+
+const baseUrl = `${import.meta.env.VITE_API_URL}`;
 
   // Fetch attendance data
   useEffect(() => {
