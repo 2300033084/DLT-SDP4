@@ -18,7 +18,7 @@ services:
       retries: 5
 
   backend:
-    
+    image: yashodhanreddy/employee-management-backend:latest
     container_name: ems-backend
     ports:
       - "2025:8080"
@@ -30,7 +30,7 @@ services:
       - ems-network
 
   frontend:
-    
+    image: yashodhanreddy/employee-management-frontend:latest
     container_name: ems-frontend
     ports:
       - "3000:80"
