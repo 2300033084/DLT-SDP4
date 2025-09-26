@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import reactSwc from '@vitejs/plugin-react-swc';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [reactSwc()],
   // Keep the relative base path fix for Nginx
   base: './', 
   build: {
