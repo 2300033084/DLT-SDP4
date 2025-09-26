@@ -19,12 +19,8 @@ services:
 
   backend:
     container_name: ems-backend
-    build:
-      image: yashodhanreddy/employee-management-backend
-      # Use the project root as the context
-      context: .
-      # Path to the Dockerfile is relative to the context
-      dockerfile: ./SDP-FULLSTACK/backend.Dockerfile
+    # Pulling the backend image from Docker Hub
+    image: yashodhanreddy/employee-management-backend:latest
     ports:
       - "2025:8080"
     depends_on:
@@ -38,12 +34,8 @@ services:
 
   frontend:
     container_name: ems-frontend
-    build:
-      image: yashodhanreddy/employee-management-frontend
-      # Use the project root as the context
-      context: .
-      # Path to the Dockerfile is relative to the context
-      dockerfile: ./SDP-FULLSTACK/frontend.Dockerfile
+    # Pulling the frontend image from Docker Hub
+    image: yashodhanreddy/employee-management-frontend:latest
     ports:
       - "3000:80"
     depends_on:
@@ -58,3 +50,4 @@ volumes:
 networks:
   ems-network:
     driver: bridge
+
