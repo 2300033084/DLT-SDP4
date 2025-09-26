@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Table, Spinner, Nav, Button, Alert, Accordion, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Table, Spinner, Nav, Button, Alert, Accordion, Badge } from 'react-bootstrap';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-import './Manager/ManagerDashboard.css'; // Re-using styling for consistency
+import './Manager/ManagerDashboard.css';
 
 const SuperAdminEmployeeManagement = () => {
     const [managers, setManagers] = useState([]);
@@ -11,7 +11,6 @@ const SuperAdminEmployeeManagement = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
-    //const API_BASE_URL = 'http://localhost:8080';
     const baseUrl = `${import.meta.env.VITE_API_URL}`;
 
     const fetchManagersWithEmployees = async () => {
@@ -41,19 +40,17 @@ const SuperAdminEmployeeManagement = () => {
     useEffect(() => {
         fetchManagersWithEmployees();
     }, []);
-    
-    const handleDeactivateEmployee = async (employeeId) => {
-        if (window.confirm("Are you sure you want to deactivate this employee? They will no longer be able to log in.")) {
-            try {
-                const url = `${baseUrl}/superadmin/updateEmployeeStatus/${employeeId}`;
-                const response = await axios.post(url, null, { params: { status: 'DEACTIVATED' } });
-                
-                fetchManagersWithEmployees();
-                alert(response.data);
-            } catch (err) {
-                console.error("Error deactivating employee:", err);
-                alert("Failed to deactivate employee.");
-            }
+
+    const handleUpdateEmployeeStatus = async (employeeId, status) => {
+        try {
+            const url = `${baseUrl}/api/employees/updateEmployeeStatus/${employeeId}`;
+            const response = await axios.post(url, null, { params: { status } });
+
+            fetchManagersWithEmployees(); // Refresh list
+            alert(response.data);
+        } catch (err) {
+            console.error("Error updating employee status:", err);
+            alert("Failed to update employee status.");
         }
     };
 
@@ -81,7 +78,6 @@ const SuperAdminEmployeeManagement = () => {
                                 <i className="bi bi-people-fill me-2"></i>Employee Management
                             </Nav.Link>
                         </Nav.Item>
-                        {/* New Nav.Item for Announcements */}
                         <Nav.Item className="mb-2">
                             <Nav.Link as={Link} to="/superadmin/announcements" className={`text-white hover-bg-primary-dark rounded ${location.pathname === '/superadmin/announcements' ? 'active bg-primary-dark' : ''}`}>
                                 <i className="bi bi-megaphone me-2"></i>Announcements
@@ -99,6 +95,8 @@ const SuperAdminEmployeeManagement = () => {
                         </Nav.Item>
                     </Nav>
                 </Col>
+
+                {/* Main Content */}
                 <Col md={10} className="main-content p-4">
                     <div className="d-flex justify-content-between align-items-center mb-4">
                         <h2 className="text-primary fw-bold">Centralized Employee Management</h2>
@@ -144,19 +142,43 @@ const SuperAdminEmployeeManagement = () => {
                                                                 <td>{employee.name}</td>
                                                                 <td>{employee.email}</td>
                                                                 <td>
-                                                                    <Badge bg={employee.status === 'ACCEPTED' ? 'success' : 'danger'}>
+                                                                    <Badge bg={
+                                                                        employee.status === 'ACCEPTED' ? 'success' :
+                                                                        employee.status === 'PENDING' ? 'warning' :
+                                                                        employee.status === 'REJECTED' ? 'danger' : 'secondary'
+                                                                    }>
                                                                         {employee.status}
                                                                     </Badge>
                                                                 </td>
                                                                 <td>
-                                                                    <Button 
-                                                                        variant="danger" 
-                                                                        size="sm"
-                                                                        onClick={() => handleDeactivateEmployee(employee.id)}
-                                                                        disabled={employee.status !== 'ACCEPTED'}
-                                                                    >
-                                                                        Deactivate
-                                                                    </Button>
+                                                                    {employee.status === "PENDING" && (
+                                                                        <>
+                                                                            <Button
+                                                                                variant="success"
+                                                                                size="sm"
+                                                                                className="me-2"
+                                                                                onClick={() => handleUpdateEmployeeStatus(employee.id, "ACCEPTED")}
+                                                                            >
+                                                                                Accept
+                                                                            </Button>
+                                                                            <Button
+                                                                                variant="warning"
+                                                                                size="sm"
+                                                                                onClick={() => handleUpdateEmployeeStatus(employee.id, "REJECTED")}
+                                                                            >
+                                                                                Reject
+                                                                            </Button>
+                                                                        </>
+                                                                    )}
+                                                                    {employee.status === "ACCEPTED" && (
+                                                                        <Button
+                                                                            variant="danger"
+                                                                            size="sm"
+                                                                            onClick={() => handleUpdateEmployeeStatus(employee.id, "DEACTIVATED")}
+                                                                        >
+                                                                            Deactivate
+                                                                        </Button>
+                                                                    )}
                                                                 </td>
                                                             </tr>
                                                         ))}

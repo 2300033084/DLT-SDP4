@@ -10,6 +10,8 @@ import com.klef.sdp.service.EmployeeService;
 
 import java.util.List;
 import java.util.Optional;
+import com.klef.sdp.enums.Status;
+//import com.klef.sdp.service.EmployeeService;
 
 @CrossOrigin("*")
 @RestController
@@ -66,4 +68,28 @@ public class EmployeeController {
         
         return ResponseEntity.ok("Employee added successfully!");
     }
+    @PostMapping("/updateEmployeeStatus/{employeeId}")
+public ResponseEntity<String> updateEmployeeStatus(
+        @PathVariable Long employeeId,
+        @RequestParam String status) {
+    try {
+        Employee employee = employeeService.getEmployeeById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        // Convert string to enum
+        Status newStatus = Status.valueOf(status.toUpperCase());
+        employee.setStatus(newStatus);
+
+        employeeService.addEmployee(employee);
+
+
+        return ResponseEntity.ok("Employee status updated to " + newStatus);
+    } catch (IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body("Invalid status value. Use PENDING, ACCEPTED, REJECTED, or DEACTIVATED.");
+    } catch (Exception e) {
+        return ResponseEntity.badRequest().body("Error updating employee status: " + e.getMessage());
+    }
 }
+
+}
+
