@@ -16,7 +16,7 @@ RUN npm run build
 FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 # nginx.conf lives in SDP-FULLSTACK (visible because context is project root)
-COPY SDP-FULLSTACK/nginx.conf /etc/nginx/conf.d/default.conf
+#COPY SDP-FULLSTACK/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
