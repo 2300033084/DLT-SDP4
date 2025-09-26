@@ -21,7 +21,7 @@ services:
     image: sanjaysammy2005/employee-management-backend:latest
     container_name: ems-backend
     ports:
-      - "2025:2025"
+      - "2025:8080"
     depends_on:
       mysqldb:
         condition: service_healthy
